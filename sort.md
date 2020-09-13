@@ -69,16 +69,13 @@ public:
 > Output: [[1,2],[3,10],[12,16]]
 > Explanation: Because the new interval [4,8] overlaps with [3,5],[6,7],[8,10].
 
-- coding细节
-- newInterval始终指向要处理的下一个元素
+- coding细节，newInterval变量的处理
+- 向两边扩范围
 
-···
+```
 class Solution {
 public:
     vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval) {
-        //if (intervals == NULL || newInterval == NULL){
-        //    return intervals;
-        //}
         
         vector<vector<int>> result;
         if (intervals.size() == 0){
@@ -86,26 +83,27 @@ public:
             return result;
         }
         
-        
         for ( int i=0; i<intervals.size(); i++){
             vector<int> cur = intervals[i];
             if ( cur[1] < newInterval[0]){
-                result.push_back(cur);
+                result.push_back(cur); // cur在待插入区间前，cur插入
             }
             else if ( cur[0] > newInterval[1]){
+                // cur待插入区间后，待插入区间放入result，newInterval变量的处理技巧
                 result.push_back(newInterval);
                 newInterval = cur;
             }
             else{
+                // 出现重叠。重叠未完全结束前，newInterval变量向两边扩。
                 newInterval[0] = min(cur[0], newInterval[0]);
                 newInterval[1] = max(cur[1], newInterval[1]);
             }
             
         }
-        result.push_back(newInterval);
+        result.push_back(newInterval); // 不用newInterval，新建一个变量也可以。
         return result;
     }
 };
-···
+```
 
 
