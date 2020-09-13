@@ -89,18 +89,19 @@ public:
                 result.push_back(cur); // cur在待插入区间前，cur插入
             }
             else if ( cur[0] > newInterval[1]){
-                // cur待插入区间后，待插入区间放入result，newInterval变量的处理技巧
+                // cur待插入区间后，插入二者中靠前的那个（此时是cur）；转移待插入区间（newInterval变量的处理）
                 result.push_back(newInterval);
                 newInterval = cur;
             }
             else{
-                // 出现重叠。重叠未完全结束前，newInterval变量向两边扩。
+                // cur和待插入区间出现重叠。重叠未完全结束前，newInterval变量向两边扩。
+                // 重叠完全处理完之后，插入操作在上两个if处理
                 newInterval[0] = min(cur[0], newInterval[0]);
                 newInterval[1] = max(cur[1], newInterval[1]);
             }
             
         }
-        result.push_back(newInterval); // 不用newInterval，新建一个变量也可以。
+        result.push_back(newInterval); // 因为有newInterval = cur，需要这个操作
         return result;
     }
 };
