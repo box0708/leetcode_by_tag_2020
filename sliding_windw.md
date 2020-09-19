@@ -49,3 +49,69 @@ public:
     }
 };
 ···
+
+---
+
+# [最大值减去最小值小于或等于num的子数组数量](https://www.nowcoder.com/questionTerminal/5fe02eb175974e18b9a546812a17428e)
+
+> 给定数组 arr 和整数 num，共返回有多少个子数组满足如下情况：
+> max(arr[i...j]) - min(arr[i...j]) <= num
+> max(arr[i...j])表示子数组arr[i...j]中的最大值，min[arr[i...j])表示子数组arr[i...j]中的最小值。
+>
+> 输入
+> 5 2 
+> 1 2 3 4 5
+> 输出
+> 12
+
+```
+#include <bits/stdc++.h>
+using namespace std;
+ 
+int main(){
+    int n, m;
+    cin>>n>>m;
+    int a[n], cnt=n;
+    for(int i=0;i<n;i++){
+        cin>>a[i];
+    }
+    // 双端队列，存下标
+    deque<int> minq;
+    deque<int> maxq;
+    
+    int left=0, right=0, res=0;
+    while(left < n){
+       while (right < n){
+       // 维护两个滑动窗口结构，此处注意用right下标
+            while (!maxq.empty() && a[right] >= a[maxq.back()]){
+               maxq.pop_back();
+           }
+           maxq.push_back(right);
+           while (!minq.empty() && a[right] <= a[minq.back()]){
+               minq.pop_back();
+           }
+           minq.push_back(right);
+           
+           if (a[maxq.front()] - a[minq.front()] > m){
+               break;
+           }
+           right++;
+       }
+        
+        if (minq.front() == left){
+            minq.pop_front();
+        }
+        if (maxq.front() == left){
+            maxq.pop_front();
+        }
+        // 最右边结束，计算当前res加多少
+        res += (right-left);
+        left++;
+    }
+    
+    
+    cout<<res<<endl;
+    return 0;
+    
+}
+```
