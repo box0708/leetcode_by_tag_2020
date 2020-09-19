@@ -1,5 +1,6 @@
 # 滑动窗口类题目
 
+## [239. Sliding Window Maximum]https://leetcode.com/problems/sliding-window-maximum/
 > You are given an array of integers nums, there is a sliding window of size k which is moving from the very left of the array to the very right. You can only see the k numbers in the window. Each time the sliding window moves right by one position.
 >
 > Return the max sliding window.
@@ -9,6 +10,11 @@
 > Output: [3,3,5,5,6,7]
 
 返回滑动窗口最大值数组
+- 注意res数组大小
+- 中心思想：双端队列头始终是当前窗口最大值
+- 遍历过程中，当前数比队尾大就一直弹（保存小的没意义）
+- 边界
+- trick：双端队列存数组下标
 
 ···
 class Solution {
