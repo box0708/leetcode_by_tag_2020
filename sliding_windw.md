@@ -16,7 +16,7 @@
 - 边界
 - trick：双端队列存数组下标
 
-···
+```
 class Solution {
 public:
     vector<int> maxSlidingWindow(vector<int>& nums, int k) {
@@ -48,7 +48,7 @@ public:
         return res;
     }
 };
-···
+```
 
 ---
 
