@@ -115,3 +115,54 @@ int main(){
     
 }
 ```
+---
+## [76. Minimum Window Substring](https://leetcode.com/problems/minimum-window-substring/)
+
+> Given a string S and a string T, find the minimum window in S which will contain all the characters in T in complexity O(n).
+> 
+> Example:
+> 
+> Input: S = "ADOBECODEBANC", T = "ABC"
+> Output: "BANC"
+```
+class Solution {
+public:
+    string minWindow(string s, string t) {
+        int left=0; // 当前满足包含t所有字母的起点
+        int cnt=0; // cnt==t.length 表示已经包含了t内所有字母
+        int minLeft = -1;
+        int minLen = INT_MAX;
+        vector<int> letterCnt(128,0); // trick:char类型的处理
+        for (char c:t){
+            letterCnt[c] += 1;
+        }
+        
+        for ( int i=0; i < s.size(); i++){
+            if (--letterCnt[s[i]] >= 0){
+                cnt += 1; // 如果当前右边界遍历到的字母，
+                            //map内减一>=0, 说明命中了t内字母，cnt++
+            }
+            while ( cnt == t.size()){
+                // 当前窗口达标
+                int cur_len = i - left + 1;
+                if (minLen > cur_len){
+                    minLen = cur_len;
+                    minLeft = left;
+                }
+                // 左边界往右移动，是否达标。
+                // 不达标了，cnt--，退出循环
+                if ( ++letterCnt[s[left]] > 0){
+                    cnt -=1;
+                }
+                left++;
+            }
+        }
+        if (minLeft == -1){
+            return "";
+        }
+        else{
+            return s.substr(minLeft, minLen);
+        }
+    }
+};
+```
