@@ -124,6 +124,9 @@ int main(){
 > 
 > Input: S = "ADOBECODEBANC", T = "ABC"
 > Output: "BANC"
+- 滑动窗口，右边界向右移动，移动至达标/不达标后，左边界向右移动，挨个检查
+- trick：char类型处理
+- while循环的使用，当前窗口是否达标的标示符使用（cnt变量）
 ```
 class Solution {
 public:
