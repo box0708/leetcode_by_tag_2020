@@ -177,7 +177,7 @@ public:
 > Find the length of the longest sub-string containing all repeating letters you can get after performing the above operations.
 > 
 > Note:
-> Both the string's length and k will not exceed 104.
+> Both the string's length and k will not exceed 10^4.
 > 
 > Example 1:
 > Input:
@@ -218,6 +218,115 @@ public:
             res = max(res, right - left + 1);
         }
         return res;
+    }
+};
+```
+---
+## [438. Find All Anagrams in a String](https://leetcode.com/problems/find-all-anagrams-in-a-string/)
+
+> Given a string s and a non-empty string p, find all the start indices of p's anagrams in s.
+> Strings consists of lowercase English letters only and the length of both strings s and p will not be larger than 20,100.
+> The order of output does not matter.
+> 
+> Example 1:
+> 
+> Input:
+> 
+> s: "cbaebabacd" p: "abc"
+> 
+> Output:
+> 
+> [0, 6]
+> 
+> Explanation:
+> 
+> The substring with start index = 0 is "cba", which is an anagram of "abc".
+> The substring with start index = 6 is "bac", which is an anagram of "abc".
+
+- 可看作是76题的变体
+- 此处达标条件变成了 cnt==s.size() && 窗口长度 == p.size()
+
+```
+class Solution {
+public:
+    vector<int> findAnagrams(string s, string p) {
+        vector<int> res;
+        if (s.size() == 0 || s.size() < p.size()){
+            return res;
+        }
+        vector<int> letterCnt(26, 0);
+        int left = 0, cnt = 0;
+        for (char c : p){
+            letterCnt[c - 'a'] += 1;
+        }
+        
+        for ( int right=0; right < s.size(); right++){
+            if ( --letterCnt[s[right] - 'a'] >= 0){
+                cnt += 1;
+            }
+            // 符合条件：cnt==s.size() 且窗口长度ok
+            // 收缩左边界：1）长度不对 2）字母不对
+            while(cnt == p.size()){
+                if ( (right - left + 1) == p.size() ){
+                    res.push_back(left);
+                }
+                if ( ++letterCnt[s[left] - 'a'] > 0){
+                    cnt -= 1;
+                }
+                left++;
+            }
+        }
+        return res;
+    }
+};
+```
+---
+## [67. Permutation in String](https://leetcode.com/problems/permutation-in-string/)
+
+> Given two strings s1 and s2, write a function to return true if s2 contains the permutation of s1. In other words, one of the first string's permutations is the substring of the second string.
+> 
+> Example 1:
+> 
+> Input: s1 = "ab" s2 = "eidbaooo"
+> 
+> Output: True
+> 
+> Explanation: s2 contains one permutation of s1 ("ba").
+
+基本同之前套路
+
+```
+class Solution {
+public:
+    bool checkInclusion(string s1, string s2) {
+        if (s2.size() == 0 || s1.size() > s2.size()){
+            return false;
+        }
+        if (s1.size() == 0){
+            return true;
+        }
+        vector<int> letterCnt(26, 0); 
+        int left=0, cnt=0;
+        
+        for ( char c: s1){
+            letterCnt[c - 'a'] += 1;
+        }
+        
+        for ( int right=0; right < s2.size(); right++){
+            if ( --letterCnt[s2[right] - 'a'] >= 0){
+                cnt += 1;
+            }
+            while ( cnt == s1.size()){
+                if ((right - left + 1) == s1.size()){
+                    return true;
+                }
+                if ( ++letterCnt[s2[left] - 'a'] > 0){
+                    cnt--;
+                }
+                left ++;
+            }
+        }
+        return false;
     }
 };
 ```
