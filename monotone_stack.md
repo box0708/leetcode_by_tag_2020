@@ -10,7 +10,7 @@
 ## 例题
 
 ### [42. Trapping Rain Water](https://leetcode.com/problems/trapping-rain-water/)
-- 此题生成一个池子就可以结算，因此可以使用while循环
+- 此题生成一个水槽就可以结算，因此可以使用while循环。coding细节
 ```
 class Solution {
 public:
@@ -83,6 +83,99 @@ public:
             mono_stack.push(i);
         }
         return res;     
+    }
+};
+```
+---
+### [402. Remove K Digits](https://leetcode.com/problems/remove-k-digits/)
+
+> Given a non-negative integer num represented as a string, remove k digits from the number so that the new number is the smallest possible.
+> 
+> Note:
+> 
+> The length of num is less than 10002 and will be ≥ k.
+> 
+> The given num does not contain any leading zero.
+> 
+> Example 1:
+> 
+> Input: num = "1432219", k = 3
+> 
+> Output: "1219"
+> 
+> Explanation: Remove the three digits 4, 3, and 2 to form the new number 1219 which is the smallest.
+- 生成最小数字，在高位尽可能删除较大的数字。greedy
+- 单调栈思想（递增）。扫描字符串，遇到比栈顶（当前res末位）小的数字就删掉末尾，入新数字。
+- 此题利用`std::string`内的一些api来模仿真正的栈（push_back, pop_back, erase）
+- coding细节，while的运用。
+```
+class Solution {
+public:
+    string removeKdigits(string num, int k) {
+        string res = "";
+        int length=num.size(), keep = length-k;
+        for ( char c : num){
+            while ( k != 0 && res.size() != 0 && res.back() > c){
+                res.pop_back();
+                k--;
+            }
+            res.push_back(c);
+        }
+        res.resize(keep);
+        
+        while ( res.size() != 0 && res[0] == '0'){
+            res.erase(res.begin());
+        }
+        if ( res.empty()){
+            return "0";
+        }
+        else{
+            return res;
+        }
+    }
+};
+```
+---
+### [768. Max Chunks To Make Sorted II](https://leetcode.com/problems/max-chunks-to-make-sorted-ii/)
+
+> Given an array arr of integers (not necessarily distinct), we split the array into some number of "chunks" (partitions), and individually sort each chunk.  After concatenating them, the result equals the sorted array.
+> 
+> What is the most number of chunks we could have made?
+> 
+> Example 2:
+> 
+> Input: arr = [2,1,3,4,4]
+> 
+> Output: 4
+> 
+> Explanation:
+> 
+> We can split into two chunks, such as [2, 1], [3, 4, 4].
+> However, splitting into [2, 1], [3], [4], [4] is the highest number of chunks possible.
+- 根据题意，最后目标数组为递增排序，考虑用单调栈
+- 遍历`arr`，发现当前位置比栈顶大，当前位置可能是新块的起点，当前位置数字可能是新块内的最大值，入栈（可能的块数+1）。
+- 发现当前比栈顶小，则当前数字不是新块起点。取cur_max出来。实际上是给小数字找个块塞进去。继续看栈内栈顶。如果比某个栈顶大，说明栈顶块不会包含此位置数字，则把cur_max压栈，说明较小数字已经被括在了一个块内。
+```
+class Solution {
+public:
+    int maxChunksToSorted(vector<int>& arr) {
+        stack<int> mono_stack;
+        int res = 0;
+        for ( int i=0; i < arr.size(); i++){
+            if ( mono_stack.empty() || arr[i] >= mono_stack.top()){
+                mono_stack.push(arr[i]);
+            }
+            else{
+                int cur_max = mono_stack.top();
+                mono_stack.pop(); // 当前最大值
+                while ( !mono_stack.empty() && arr[i] < mono_stack.top()){
+                    mono_stack.pop();
+                }
+                mono_stack.push(cur_max);
+            }
+        }
+        return mono_stack.size();
+        
     }
 };
 ```
