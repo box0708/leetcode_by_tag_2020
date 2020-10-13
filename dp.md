@@ -1,4 +1,4 @@
-# ¶¯Ì¬¹æ»®Ïà¹ØÌâÄ¿
+# åŠ¨æ€è§„åˆ’ç›¸å…³é¢˜ç›®
 
 ### [120. Triangle](https://leetcode.com/problems/triangle/)
 
@@ -15,8 +15,8 @@
 ]
 ```
 > The minimum path sum from top to bottom is 11 (i.e., 2 + 3 + 5 + 1 = 11).
-- ÕıÏò/·´ÏòÇó½âµÄ±ä»»
-- ³õÊ¼»¯Æğµã/ÖÕµã£¬ÇóÖÕµã/Æğµã
+- æ­£å‘/åå‘æ±‚è§£çš„å˜æ¢
+- åˆå§‹åŒ–èµ·ç‚¹/ç»ˆç‚¹ï¼Œæ±‚ç»ˆç‚¹/èµ·ç‚¹
 ```
 class Solution {
 public:
@@ -26,7 +26,7 @@ public:
         }
         vector<vector<int>> dp(triangle);
         for ( int i=dp.size()-2; i >= 0; i--){
-            // ×îºóÒ»ĞĞ¿ªÊ¼
+            // æœ€åä¸€è¡Œå¼€å§‹
             for ( int j=0; j < dp[i].size(); j++){
                 dp[i][j] += min(dp[i+1][j], dp[i+1][j+1]);
             }

@@ -1,4 +1,4 @@
-# Ì°ĞÄËã·¨
+# è´ªå¿ƒç®—æ³•
 ## [55. Jump Game ???](https://leetcode.com/problems/jump-game/)
 > Given an array of non-negative integers, you are initially positioned at the first index of the array.
 > 
@@ -17,17 +17,17 @@ Input: nums = [3,2,1,0,4]
 Output: false
 Explanation: You will always arrive at index 3 no matter what. Its maximum jump length is 0, which makes it impossible to reach the last index.
 ```
-- Ö»¹ØĞÄÄÜ²»ÄÜµ½×îÓÒ±ß£¬¿¼ÂÇÌ°ĞÄ
-- ±ß½çÌõ¼ş
+- åªå…³å¿ƒèƒ½ä¸èƒ½åˆ°æœ€å³è¾¹ï¼Œè€ƒè™‘è´ªå¿ƒ
+- è¾¹ç•Œæ¡ä»¶
 ```
 class Solution {
 public:
     bool canJump(vector<int>& nums) {
-        int reach = 0; // µ±Ç°ÄÜÌøµ½µÄ×îÔ¶¾àÀë
+        int reach = 0; // å½“å‰èƒ½è·³åˆ°çš„æœ€è¿œè·ç¦»
         for ( int i=0; i < nums.size(); i++){
             if ( i > reach || reach >= nums.size()-1){
-                // i > reach ºó£¬ºóÃæ²»ĞèÒª¿¼ÂÇÁË£¨¿Ï¶¨µ½²»ÁË£©
-                // ±ß½çÌõ¼ş¿ØÖÆ
+                // i > reach åï¼Œåé¢ä¸éœ€è¦è€ƒè™‘äº†ï¼ˆè‚¯å®šåˆ°ä¸äº†ï¼‰
+                // è¾¹ç•Œæ¡ä»¶æ§åˆ¶
                 break;
             }
             reach = max( reach, i + nums[i]);
@@ -53,7 +53,7 @@ Output: 2
 Explanation: The minimum number of jumps to reach the last index is 2.
     Jump 1 step from index 0 to 1, then 3 steps to the last index.
 ```
-- Õû¸öÌ°ĞÄÑ­»·ÆäÊµÊÇÔÚ°¤¸öÌ°µ±Ç°Î»ÖÃµÄÏÂÒ»¸ö£¬ºÍÆäÄÜÌøµ½µÄ×îÔ¶¾àÀë¡£ËùÒÔcur_beginºÍcur_end¸üĞÂÓï¾ä²»¿ÉÒÔµ÷»»Ë³Ğò
+- æ•´ä¸ªè´ªå¿ƒå¾ªç¯å…¶å®æ˜¯åœ¨æŒ¨ä¸ªè´ªå½“å‰ä½ç½®çš„ä¸‹ä¸€ä¸ªï¼Œå’Œå…¶èƒ½è·³åˆ°çš„æœ€è¿œè·ç¦»ã€‚æ‰€ä»¥cur_beginå’Œcur_endæ›´æ–°è¯­å¥ä¸å¯ä»¥è°ƒæ¢é¡ºåº
 ```
 class Solution {
 public:
