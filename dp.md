@@ -1,5 +1,5 @@
 # 动态规划相关题目
-
+## 单序列动态规划
 ### [120. Triangle](https://leetcode.com/problems/triangle/)
 
 > Given a triangle, find the minimum path sum from top to bottom. Each step you may move to adjacent numbers on the row below.
@@ -168,6 +168,87 @@ public:
             }
         }
         return dp[n];
+    }
+};
+```
+---
+## 双序列动态规划
+
+### [***10. Regular Expression Matching](https://leetcode.com/problems/regular-expression-matching/) 
+```
+Given an input string (s) and a pattern (p), implement regular expression matching with support for '.' and '*' where: 
+
+'.' Matches any single character.​​​​
+'*' Matches zero or more of the preceding element.
+The matching should cover the entire input string (not partial).
+
+Example 1:
+
+Input: s = "aa", p = "a"
+Output: false
+Explanation: "a" does not match the entire string "aa".
+Example 2:
+
+Input: s = "aa", p = "a*"
+Output: true
+Explanation: '*' means zero or more of the preceding element, 'a'. Therefore, by repeating 'a' once, it becomes "aa".
+Example 3:
+
+Input: s = "ab", p = ".*"
+Output: true
+Explanation: ".*" means "zero or more (*) of any character (.)".
+Example 4:
+
+Input: s = "aab", p = "c*a*b"
+Output: true
+Explanation: c can be repeated 0 times, a can be repeated 1 time. Therefore, it matches "aab".
+Example 5:
+
+Input: s = "mississippi", p = "mis*is*p*."
+Output: false
+```
+- 见代码注释
+- 异常输入要做处理，就算题干没说
+```
+class Solution {
+public:
+    bool isMatch(string s, string p) {
+        int m=s.length(), n=p.length();
+        if (n>0 && p[0] == '*'){
+            return false; // *开头的是非法输入，但是oj里面也有，要做处理，否则不ac
+        }
+        // dp数组含义：dp[i][j] 表示s[0,i-1]与p[0,j-1]是否匹配
+        vector<vector<bool>> dp(m+1, vector<bool>(n+1, false));
+        dp[0][0] = true; // 空串匹配，coding技巧
+        for ( int i=1; i <=m; i++){
+            dp[i][0] = false; // p是空串，则无法匹配任何s
+        }
+        for ( int j=1; j <=n; j++){
+            // 此处处理的问题，p为“x*---”这种。*代表不用x的时候，可以匹配空串
+            if ( j>1 && '*' == p[j-1] && dp[0][j-2]){
+                dp[0][j] = true;
+            }
+        }
+        for ( int i=1; i < m+1; i++){
+            for ( int j=1; j < n+1; j++){
+                if ( p[j-1] != '*'){
+                    // 最基本情况：无特殊符号，当前匹配的上 and 前一位置匹配的上
+                    dp[i][j] = dp[i-1][j-1] && (p[j-1] == '.' || s[i-1] == p[j-1]);
+                }
+                else{
+                    // p[j-1] == '*'时，设p[j-2]为字符x
+                    // 情况a："---x*---"中，*代表x重复0次，即为dp[i][j-2] （x相当于没了）
+                    // 情况b：*代表x重复至少1次，隐含为：“---xXX---”（大写表示重复出来的）
+                    //      (s[i-1] == p[j-2] ||  '.' == p[j-2])表示p内*前一个（j-2位置）与x内i-1位置字符匹配
+                    //      dp[i-1][j] 其实隐含了s内有重复字符。
+                    //      例：s="abbba", p="ab*a"
+                    //      当处理到*号时，若*前面的b与s[i-1]匹配，且s[0,i-2]与p[0,j-1]匹配
+                    //      只能是 abb与ab*能匹配，abb后面的b能被*匹配，*代表b出现多次
+                    dp[i][j] = dp[i][j-2] || (s[i-1] == p[j-2] ||  '.' == p[j-2]) && dp[i-1][j];
+                }
+            }
+        }
+        return dp[m][n];
     }
 };
 ```
