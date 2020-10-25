@@ -372,3 +372,60 @@ public:
     }
 };
 ```
+---
+### [97. Interleaving String](https://leetcode.com/problems/interleaving-string/)
+```
+Given strings s1, s2, and s3, find whether s3 is formed by an interleaving of s1 and s2.
+
+An interleaving of two strings s and t is a configuration where they are divided into non-empty substrings such that:
+
+s = s1 + s2 + ... + sn
+t = t1 + t2 + ... + tm
+|n - m| <= 1
+The interleaving is s1 + t1 + s2 + t2 + s3 + t3 + ... or t1 + s1 + t2 + s2 + t3 + s3 + ...
+Note: a + b is the concatenation of strings a and b.
+
+Example 1:
+Input: s1 = "aabcc", s2 = "dbbca", s3 = "aadbbcbcac"
+Output: true
+
+Example 2:
+Input: s1 = "aabcc", s2 = "dbbca", s3 = "aadbbbaccc"
+Output: false
+
+Example 3:
+Input: s1 = "", s2 = "", s3 = ""
+Output: true
+```
+- 看注释
+- 此类题目高度套路化，不要想复杂
+```
+class Solution {
+public:
+    bool isInterleave(string s1, string s2, string s3) {
+        if ( s1.size() + s2.size() != s3.size()){
+            // 隐含条件要考虑，否则不ac
+            return false;
+        }
+        int m=s1.size(), n=s2.size();
+        vector<vector<bool>> dp(m+1, vector<bool>(n+1, false));
+        dp[0][0] = true;
+        
+        for ( int i=1; i < m+1; i++){
+            // 只用s1拼s3
+            dp[i][0] = s1[i-1] == s3[i-1] && dp[i-1][0];
+        }
+        for ( int j=1; j < n+1; j++){
+            // 只用s2拼s3
+            dp[0][j] = s2[j-1] == s3[j-1] && dp[0][j-1];
+        }
+        for ( int i=1; i < m+1; i++){
+            for ( int j=1; j < n+1; j++){
+                // 分别考虑用s1/s2当前字符匹配s3对应位置字符，此时另一个没用的字符串的最新位置没参与匹配，s3下标需要-1
+                dp[i][j] = (s1[i-1] == s3[i-1+j] && dp[i-1][j]) || (s2[j-1] == s3[i+j-1] && dp[i][j-1]);
+            }
+        }
+        return dp[m][n];
+    }
+};
+```
