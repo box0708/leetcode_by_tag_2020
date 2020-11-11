@@ -478,6 +478,174 @@ public:
 };
 ```
 ---
-## 股票类dp问题
+## 股票类dp问题(局部最优+全局最优)
 
-https://wangxin1248.github.io/algorithm/2020/05/leetcode-stock.html 这个教程很好，先马着
+### [188. Best Time to Buy and Sell Stock IV](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/)
+```
+You are given an integer array prices where prices[i] is the price of a given stock on the ith day.
+
+Design an algorithm to find the maximum profit. You may complete at most k transactions.
+
+Notice that you may not engage in multiple transactions simultaneously (i.e., you must sell the stock before you buy again).
+
+Example 1:
+
+Input: k = 2, prices = [2,4,1]
+Output: 2
+Explanation: Buy on day 1 (price = 2) and sell on day 2 (price = 4), profit = 4-2 = 2.
+Example 2:
+
+Input: k = 2, prices = [3,2,6,5,0,3]
+Output: 7
+Explanation: Buy on day 2 (price = 2) and sell on day 3 (price = 6), profit = 6-2 = 4. Then buy on day 5 (price = 0) and sell on day 6 (price = 3), profit = 3-0 = 3.
+```
+- 此题为通解。[参考链接](https://www.jianshu.com/p/26f792f83ee4)
+- `local[i][j]`代表局部最优：第`i`天最多`j`次交易最大利润
+- `global[i][j]`全局最优
+- 二维dp数组中`k`对应的那一维多开一位，同上面总结的题目
+- *一买，一卖，算一次交易*
+- `local[i][j] = max( global[i-1][j-1] + max(0, diff), local[i-1][j] + diff);`更新方程的理解
+  - `global[i-1][j-1] + max(0, diff)`: 第i-1天，已经交易了j-1次。在第i天要完成一次交易。如果能赚钱，i-1买i卖；如果不能，i买i卖（当天交易）
+  - `local[i-1][j] + diff`: 第i-1天已经完成了j-1次交易，且第j次交易的买入在i-1天；此时第i天完成第j次交易的卖出。
+```
+class Solution {
+public:
+    int maxProfit(int k, vector<int>& prices) {
+        if ( k <= 0 || prices.size() < 2){
+            return 0;
+        }
+        int n = prices.size(); // 天数
+        if (k >= n/2){
+            // 任意次交易
+            int res = 0;
+            for ( int i=1; i < n; i++){
+                int diff = prices[i] - prices[i-1];
+                if ( diff > 0){
+                    res += diff;
+                }
+            }
+            return res;
+        }
+        else{
+            vector<vector<int>> local(n, vector<int>(k+1, 0));
+            vector<vector<int>> global(n, vector<int>(k+1, 0));
+            for ( int i=1; i < n; i++){
+                int diff = prices[i] - prices[i-1];
+                for ( int j=1; j < k+1; j++){
+                    local[i][j] = max( global[i-1][j-1] + max(0, diff), local[i-1][j] + diff);
+                    global[i][j] = max(local[i][j], global[i-1][j]);
+                }
+            }
+            return global[n-1][k];
+        }
+    }
+};
+```
+---
+## 背包类dp问题
+
+### 01背包问题
+
+> Q：有 N 件物品和一个容量为 V 的背包。放入第 i 件物品耗费的费用是 $C_i$，得到的 价值是 $W_i$。求解将哪些物品装入背包可使价值总和最大。
+
+A：dp解法。`dp[i][j]`表示前i件物品放入容量为j的背包可以获得最大价值
+```
+    dp[i][j] = max(dp[i-1][j], dp[i-1][j-c[i]] + w[i]) // 放 or 不放
+```
+
+### 完全背包问题
+
+> Q：与01背包相同，物品可以使用无限次
+```
+    dp[i][j] = max(dp[i-1][j], dp[i][j-c[i]] + w[i]) // 放 or 不放    
+```
+
+### [518. Coin Change 2](https://leetcode.com/problems/coin-change-2/)
+```
+You are given coins of different denominations and a total amount of money. Write a function to compute the number of combinations that make up that amount. You may assume that you have infinite number of each kind of coin.
+
+Example 1:
+
+Input: amount = 5, coins = [1, 2, 5]
+Output: 4
+Explanation: there are four ways to make up the amount:
+5=5
+5=2+2+1
+5=2+1+1+1
+5=1+1+1+1+1
+```
+- 做过的题注意总结
+- 边界条件处理
+```
+class Solution {
+public:
+    int change(int amount, vector<int>& coins) {
+        if (coins.size() == 0){
+            // 不给硬币 只能换出0元
+            if (amount == 0){
+                return 1;
+            }
+            else{
+                return 0;
+            }
+        }
+        int m = coins.size();
+        // 开dp数组。dp[i][j]表示用coins[i]，换j金额的换法
+        vector<vector<int>> dp(m, vector<int>(amount+1, 0));
+        dp[0][0] = 1; // 初始条件
+        // 只用第0种硬币，整除才能换
+        for ( int money=0; money <= amount; money += coins[0]){
+            dp[0][money] = 1;
+        }
+        for ( int i=1; i < m; i++){
+            for ( int j=0; j < amount+1; j++){
+                for ( int k=0; j-k*coins[i] >= 0; k++){
+                    // coins[i]选k个
+                    dp[i][j] += dp[i-1][j-k*coins[i]];
+                }
+            }
+        }
+        return dp[m-1][amount];
+    }
+};
+```
+
+### [416. Partition Equal Subset Sum](https://leetcode.com/problems/partition-equal-subset-sum/)
+```
+Given a non-empty array nums containing only positive integers, find if the array can be partitioned into two subsets such that the sum of elements in both subsets is equal.
+
+Example 1:
+
+Input: nums = [1,5,11,5]
+Output: true
+Explanation: The array can be partitioned as [1, 5, 5] and [11].
+```
+- 转化为背包问题来解
+- 恰好装满，初始化条件与最大值不同
+- 第二层循环的遍历顺序，要倒序，因为不能覆盖前面的值（二维dp压成一维之后，每次进num循环时，存的值相当于二维dp中上一行的值）
+```
+class Solution {
+public:
+    bool canPartition(vector<int>& nums) {
+        if (nums.size() <= 1){
+            return false;
+        }
+        int sum=0;
+        for ( int i=0; i < nums.size(); i++){
+            sum += nums[i];
+        }
+        if (sum % 2 == 1){
+            return false;
+        }
+        int target = sum/2;
+        vector<bool> dp(target + 1, false); // 初始化条件
+        dp[0] = true;
+        for( int num : nums){
+            for ( int j = target; j >= num; j--){
+                dp[j] = dp[j] || dp[j-num]; // 此处需要逆向遍历，不能覆盖之前的值
+            }
+        }
+        return dp[target];
+    }
+};
+```
