@@ -649,3 +649,144 @@ public:
     }
 };
 ```
+
+### [474. Ones and Zeroes](https://leetcode.com/problems/ones-and-zeroes/)
+```
+You are given an array of binary strings strs and two integers m and n.
+
+Return the size of the largest subset of strs such that there are at most m 0's and n 1's in the subset.
+
+A set x is a subset of a set y if all elements of x are also elements of y.
+
+Example 1:
+
+Input: strs = ["10","0001","111001","1","0"], m = 5, n = 3
+Output: 4
+Explanation: The largest subset with at most 5 0's and 3 1's is {"10", "0001", "1", "0"}, so the answer is 4.
+Other valid but smaller subsets include {"0001", "1"} and {"10", "1", "0"}.
+{"111001"} is an invalid subset because it contains 4 1's, greater than the maximum of 3.
+```
+- 定义转移方程。一般来说让求什么值，dp状态就是这个值。此题是遍历字符串，dp值为数量
+- 循环，反向
+```
+class Solution {
+public:
+    int findMaxForm(vector<string>& strs, int m, int n) {
+        vector<vector<int>> dp(m+1, vector<int>(n+1, 0));
+        // dp[i][j] : i个0，j个1，能组成几个字符串（子集大小）
+        for ( string str : strs){
+            int zeros=0, ones=0;
+            for (char c : str){
+                if (c == '0'){
+                    zeros += 1;
+                }
+                else{
+                    ones += 1;
+                }
+            }
+            for ( int i=m; i >= zeros; i--){
+                for ( int j=n; j >= ones; j--){
+                    dp[i][j] = max(dp[i][j], dp[i-zeros][j-ones]+1);
+                }
+            }
+        }
+        return dp[m][n];
+    }
+};
+```
+
+---
+
+## 博弈型dp
+
+### [486. Predict the Winner](https://leetcode.com/problems/predict-the-winner/)
+```
+Given an array of scores that are non-negative integers. Player 1 picks one of the numbers from either end of the array followed by the player 2 and then player 1 and so on. Each time a player picks a number, that number will not be available for the next player. This continues until all the scores have been chosen. The player with the maximum score wins.
+
+Given an array of scores, predict whether player 1 is the winner. You can assume each player plays to maximize his score.
+
+Example 1:
+
+Input: [1, 5, 2]
+Output: False
+Explanation: Initially, player 1 can choose between 1 and 2. 
+If he chooses 2 (or 1), then player 2 can choose from 1 (or 2) and 5. If player 2 chooses 5, then player 1 will be left with 1 (or 2). 
+So, final score of player 1 is 1 + 2 = 3, and player 2 is 5. 
+Hence, player 1 will never be the winner and you need to return False.
+```
+- 博弈型经典题
+- 先手/后手的收益值列出来，注意带‘绝顶聪明’条件，min/max的写法
+```
+class Solution {
+public:
+    // 递归写法
+    int first(vector<int>& nums, int i, int j){
+        // 先拿，i-j范围上最大收益
+        if (i==j){
+            return nums[i]; // 直接拿
+        }
+        else{
+            // 长度大于2，拿走两边后变成后手，调second函数
+            return max(nums[i] + second(nums, i+1, j), nums[j] + second(nums, i, j-1));
+        }
+    }
+    
+    int second(vector<int>& nums, int i, int j){
+        if ( i == j){
+            return nums[i];
+        }
+        else{
+            // 此时只可能有最小的收益，用min
+            return min(first(nums, i+1, j), first(nums, i, j-1));
+        }
+    }
+    
+    
+    bool PredictTheWinner(vector<int>& nums) {
+        if (nums.size() == 0){
+            return false;
+        }
+        if (nums.size() == 1){
+            return true;
+        }
+        int sum = 0;
+        for ( int i : nums){
+            sum += i;
+        }
+        
+        int res = first(nums, 0, nums.size()-1);
+        if ( res >= sum-res){
+            return true;
+        }
+        return false;
+        
+    }
+};
+```
+#### 解法2
+- 此处dp代表的是先发的人在[i,j]上能得到的有效分数（自己收益-对方收益）
+- 根据dp状态转移方程，决定循环是正向还是逆向
+
+>We can observe that the effective score for the current player for any given subarray nums$[x:y]$ only depends on the elements within the range $[x,y]$ in the array numsnums. It mainly depends on whether the element $nums[x]$ or $nums[y]$ is chosen in the current turn and also on the maximum score possible for the other player from the remaining subarray left after choosing the current element. Thus, it is certain that the current effective score isn't dependent on the elements outside the range $[x,y]$.
+>
+>Based on the above observation, we can say that if know the maximum effective score possible for the subarray $nums[x+1,y]$ and $nums[x,y-1]$, we can easily determine the maximum effective score possible for the subarray $nums[x,y]$ as $\text{max}(nums[x]-score_{[x+1,y]}, nums[y]-score_{[x,y-1]})$. These equations are deduced based on the last approach.
+>
+>From this, we conclude that we can make use of Dynamic Programming to determine the required maximum effective score for the array $nums$. We can make use of a 2-D dp array, such that $dp[i][j]$ is used to store the maximum effective score possible for the subarray $nums[i,j]$. The dp updation equation becomes:
+>
+> $dp[i,j] = \text{max}(nums[i] - dp[i + 1][j], nums[j] - dp[i][j - 1]dp[i,j]=nums[i]−dp[i+1][j],nums[j]−dp[i][j−1])$.
+
+```
+public class Solution {
+    public boolean PredictTheWinner(int[] nums) {
+        int[][] dp = new int[nums.length + 1][nums.length];
+        for (int s = nums.length; s >= 0; s--) {
+            for (int e = s + 1; e < nums.length; e++) {
+                int a = nums[s] - dp[s + 1][e];
+                int b = nums[e] - dp[s][e - 1];
+                dp[s][e] = Math.max(a, b);
+            }
+        }
+        return dp[0][nums.length - 1] >= 0;
+    }
+}
+```
