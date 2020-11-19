@@ -81,3 +81,83 @@ public:
     }
 };
 ```
+## 快速排序
+ 
+ [参考资料](https://blog.csdn.net/Handsome2013/article/details/82858209)
+
+### [75. Sort Colors](https://leetcode.com/problems/sort-colors/)
+```
+Given an array nums with n objects colored red, white, or blue, sort them in-place so that objects of the same color are adjacent, with the colors in the order red, white, and blue.
+
+Here, we will use the integers 0, 1, and 2 to represent the color red, white, and blue respectively.
+
+Example 1:
+
+Input: nums = [2,0,2,1,1,0]
+Output: [0,0,1,1,2,2]
+```
+- 快排的思路
+- “小于区域推着等于区域往前走”
+- 注意：0移到小于区域，left和index指针都++；2移到大于区域，index指针不加（可能把0换过来，还得检查）。
+```
+class Solution {
+public:
+    void sortColors(vector<int>& nums) {
+        if (nums.size() <= 1){
+            return;
+        }
+        int left=0, right=nums.size()-1, index=0;
+        while ( index <= right){
+            if (nums[index] == 0 ){
+                swap(nums[index++], nums[left++]);
+            }
+            else if (nums[index] == 1){
+                index++;
+            }
+            else{
+                swap(nums[index], nums[right--]);
+            }
+        }
+        return;
+    }
+};
+```
+
+### [324. Wiggle Sort II](https://leetcode.com/problems/wiggle-sort-ii/)
+
+```
+Given an unsorted array nums, reorder it such that nums[0] < nums[1] > nums[2] < nums[3]....
+
+Example 1:
+
+Input: nums = [1, 5, 1, 1, 6, 4]
+Output: One possible answer is [1, 4, 1, 5, 1, 6].
+Example 2:
+
+Input: nums = [1, 3, 2, 2, 3, 1]
+Output: One possible answer is [2, 3, 1, 3, 1, 2].
+```
+- 原数组**先排序**，然后二分，较大/较小部分各取一个
+- follow-up解法不会
+```
+class Solution {
+public:
+    void wiggleSort(vector<int>& nums) {
+        if (nums.size() <= 1){
+            return;
+        }
+        vector<int> tmp(nums);
+        sort(tmp.begin(), tmp.end()); // 先对原数组排序
+        int smallIndex = ((nums.size()+1) / 2);
+        int largeIndex = nums.size();
+        for ( int i=0; i < nums.size(); i++){
+            if (i % 2 != 0){
+                nums[i] = tmp[--largeIndex];
+            }
+            else{
+                nums[i] = tmp[--smallIndex];
+            }
+        }
+    }
+};
+```
