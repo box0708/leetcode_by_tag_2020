@@ -121,3 +121,61 @@ public:
 };
 ```
 - 解法2:堆排序(todo)
+
+### [61. Rotate List](https://leetcode.com/problems/rotate-list/submissions/)
+
+```
+Given the head of a linked list, rotate the list to the right by k places.
+
+Example 1:
+
+Input: head = [1,2,3,4,5], k = 2
+Output: [4,5,1,2,3]
+```
+- 链表指针操作军训
+```
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* rotateRight(ListNode* head, int k) {
+        if (head == NULL){
+            return NULL;
+        }
+        // get length of linked list
+        int n=0;
+        ListNode* cur = head;
+        while(cur){
+            n++;
+            cur = cur->next;
+        }
+        k = k % n;
+        ListNode* fast = head;
+        ListNode* slow = head;
+        for ( int i=0; i < k; i++){
+            if (fast->next != NULL){
+                fast = fast->next;
+            }
+        }
+        if (fast == NULL){
+            return NULL;
+        }
+        while(fast->next){
+            fast = fast->next;
+            slow = slow->next;
+        }
+        fast->next = head;
+        ListNode* newHead = slow->next;
+        slow->next = NULL;
+        return newHead;
+    }
+};
+```
