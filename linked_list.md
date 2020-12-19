@@ -233,7 +233,7 @@ public:
 > 
 > You may not modify the values in the list's nodes, only nodes itself may be changed.
 
-```
+```c++
 /**
  * Definition for singly-linked list.
  * struct ListNode {
