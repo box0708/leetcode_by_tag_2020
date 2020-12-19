@@ -179,3 +179,102 @@ public:
     }
 };
 ```
+
+### [25. Reverse Nodes in k-Group](https://leetcode.com/problems/reverse-nodes-in-k-group/)
+```
+Given a linked list, reverse the nodes of a linked list k at a time and return its modified list.
+
+k is a positive integer and is less than or equal to the length of the linked list. If the number of nodes is not a multiple of k then left-out nodes, in the end, should remain as it is.
+
+Follow up:
+
+Could you solve the problem in O(1) extra memory space?
+You may not alter the values in the list's nodes, only nodes itself may be changed.
+```
+- 每隔n个节点反转一下，注意链表操作
+- `for( int i=1; i < k; i++)` 这段循环意思是把接下来的`k`个节点反转之后接到`pre->next`上面
+```
+class Solution {
+public:
+    ListNode* reverseKGroup(ListNode* head, int k) {
+        if ( k==1 || head == NULL || head->next == NULL){
+            return head;
+        }
+        ListNode* fakeHead = new ListNode(-1);
+        fakeHead->next = head;
+        ListNode* pre = fakeHead, *cur = pre;
+        int num=0; // 链表长度
+        while(cur->next){
+            num += 1;
+            cur = cur->next;
+        }
+        while( num >= k){
+            cur = pre->next;
+            for( int i=1; i < k; i++){
+                // 链表原地反转操作，需要牢记
+                ListNode* t = cur->next;
+                cur->next = t->next;
+                t->next = pre->next;
+                pre->next = t;
+            }
+            pre = cur;
+            num -= k;
+        }
+        return fakeHead->next;
+    }
+};
+```
+
+### [143. Reorder List](https://leetcode.com/problems/reorder-list/)
+
+> Given a singly linked list L: `L0→L1→…→Ln-1→Ln`,
+> 
+> reorder it to: `L0→Ln→L1→Ln-1→L2→Ln-2→…`
+> 
+> You may not modify the values in the list's nodes, only nodes itself may be changed.
+
+```
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    void reorderList(ListNode* head) {
+        if (head == NULL || !head->next || !head->next->next ){
+            return; // 特殊输入判断
+        }
+        // step1: 快慢指针找链表中点
+        ListNode *fast = head, *slow = head;
+        while(fast->next && fast->next->next){
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        ListNode* mid = slow->next;
+        // step2: 从mid断开，后半部分链表反转
+        slow->next = NULL;
+        ListNode* last = mid, *pre = NULL;
+        while(last){
+            ListNode* next = last->next;
+            last->next = pre;
+            pre = last; // pre最后是后半部分链表的头
+            last = next;
+        }
+        // step3: 把后半部分穿插到前半部分链表
+        while(head && pre){
+            ListNode* next = head->next;
+            head->next = pre;
+            pre = pre->next;
+            head->next->next = next;
+            head = next;
+        }
+        
+    }
+};
+```
