@@ -3,7 +3,7 @@
 ### [21. Merge Two Sorted Lists](https://leetcode.com/problems/merge-two-sorted-lists/)
 > Merge two sorted linked lists and return it as a new sorted list. The new list should be made by splicing together the nodes of the first two lists.
 - 链表/指针基本操作
-```
+```c++
 /**
  * Definition for singly-linked list.
  * struct ListNode {
@@ -53,7 +53,7 @@ public:
     }
 };
 ```
-
+---
 ### [23. Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/)
 ```
 You are given an array of k linked-lists lists, each linked-list is sorted in ascending order.
@@ -78,7 +78,7 @@ merging them into one sorted list:
   - > 简单来说就是不停的对半划分，比如k个链表先划分为合并两个 k/2 个链表的任务，再不停的往下划分，直到划分成只有一个或两个链表的任务，开始合并。举个例子来说比如合并6个链表，那么按照分治法，首先分别合并0和3，1和4，2和5。这样下一次只需合并3个链表，再合并1和3，最后和2合并就可以了
 - `k=(N+1)/2`，避免`lists`长度为奇偶产生的影响
 - 直观解释：每次把`lists`长度缩减一半。`k`用意为在后半段选一个链表出来
-```
+```c++
 class Solution {
 public:
     ListNode* mergeKLists(vector<ListNode*>& lists) {
@@ -121,7 +121,7 @@ public:
 };
 ```
 - 解法2:堆排序(todo)
-
+---
 ### [61. Rotate List](https://leetcode.com/problems/rotate-list/submissions/)
 
 ```
@@ -133,7 +133,7 @@ Input: head = [1,2,3,4,5], k = 2
 Output: [4,5,1,2,3]
 ```
 - 链表指针操作军训
-```
+```c++
 /**
  * Definition for singly-linked list.
  * struct ListNode {
@@ -179,7 +179,7 @@ public:
     }
 };
 ```
-
+---
 ### [25. Reverse Nodes in k-Group](https://leetcode.com/problems/reverse-nodes-in-k-group/)
 ```
 Given a linked list, reverse the nodes of a linked list k at a time and return its modified list.
@@ -224,7 +224,7 @@ public:
     }
 };
 ```
-
+---
 ### [143. Reorder List](https://leetcode.com/problems/reorder-list/)
 
 > Given a singly linked list L: `L0→L1→…→Ln-1→Ln`,
@@ -232,7 +232,7 @@ public:
 > reorder it to: `L0→Ln→L1→Ln-1→L2→Ln-2→…`
 > 
 > You may not modify the values in the list's nodes, only nodes itself may be changed.
-
+- 链表找到需要断开的地方，切分，然后维护两个指针把两个链表串起来
 ```c++
 /**
  * Definition for singly-linked list.
@@ -275,6 +275,49 @@ public:
             head = next;
         }
         
+    }
+};
+```
+---
+### [86. Partition List](https://leetcode-cn.com/problems/partition-list/)
+
+> Given a linked list and a value x, partition it such that all nodes less than x come before nodes greater than or equal to x.
+>
+> You should preserve the original relative order of the nodes in each of the two partitions.
+> 
+> Example:
+> 
+> Input: head = `1->4->3->2->5->2`, x = 3
+> 
+> Output: `1->2->2->4->3->5`
+- 思路参照荷兰国旗问题。先找到第一个 ` >= x ` 的节点，然后把比`x`小的都移到该节点前面。
+- 指针操作。因为链表的特殊性，此题判断的指针是`node->next`，方便后续操作取前一个节点。
+
+```c++
+class Solution {
+public:
+    ListNode* partition(ListNode* head, int x) {
+        ListNode* fakeHead = new ListNode(-1); //假头
+        fakeHead->next = head;
+        ListNode* pre = fakeHead, *cur = head;
+        while(pre->next != NULL && pre->next->val < x){
+            // pre指针代表已整理过的小于区域的最后一个节点
+            pre = pre->next;
+        }
+        cur = pre;
+        while(cur->next){
+            if (cur->next->val >= x){
+                cur = cur->next; // cur为大于等于区域最后一个节点
+            }
+            else{
+                ListNode* tmp = cur->next;
+                cur->next = tmp->next;
+                tmp->next = pre->next;
+                pre->next = tmp;
+                pre = pre->next; // 更新小于区域的最后一个节点
+            }
+        }
+        return fakeHead->next;
     }
 };
 ```

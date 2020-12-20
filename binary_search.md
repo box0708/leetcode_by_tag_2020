@@ -27,7 +27,7 @@ k = 8,
 return 13.
 ```
 - 此题matrix不是完全有序，按照值进行排序
-```
+```c++
 class Solution {
 public:
     int kthSmallest(vector<vector<int>>& matrix, int k) {
@@ -75,7 +75,7 @@ Output: [3,4]
 - 此题先找左边界，再找右边界
 - 有时候别想复杂了，一遍不行就两遍，反正O(2* log n)也是O(log n)
 - 你tm千万记得手别滑，现在面试都是OJ，一定要ac，别查了半天发现是打错字了。
-```
+```c++
 class Solution {
 public:
     vector<int> searchRange(vector<int>& nums, int target) {
@@ -123,6 +123,90 @@ public:
         }
         return res;
         
+    }
+};
+```
+---
+## 原数组带旋转的二分查找
+
+ps: 此类问题原数组会分有没有重复元素。有重复元素则判断是哪半边有序的时候，`==`条件单独判断，右边界`--`.
+
+### [33. Search in Rotated Sorted Array](https://leetcode.com/problems/search-in-rotated-sorted-array/)
+
+>You are given an integer array nums sorted in ascending order, and an integer target.
+>
+> Suppose that nums is rotated at some pivot unknown to you beforehand (i.e., $[0,1,2,4,5,6,7]$ might become $[4,5,6,7,0,1,2]$).
+>
+> If target is found in the array return its index, otherwise, return -1.
+- 数组被rotate过，则总有半边是有序，符合二分查找条件
+- 左边有序，`nums[mid] > nums[right]`，即：$[4,5,6,7,0,1,2]$
+- 右边有序，`nums[mid] < nums[right]`，即：$[7,0,1,2,4,5,6]$
+- 然后判断二分查找边界更新条件
+```c++
+class Solution {
+public:
+    int search(vector<int>& nums, int target) {
+        int left = 0, right = nums.size()-1;
+        int len = nums.size();
+        while ( left <= right){
+            int mid = left + (right-left)/2;
+            if (nums[mid] == target){
+                return mid;
+            }
+            // 数组左边有序
+            else if (nums[mid] > nums[right]){
+                if (nums[mid] > target && target >= nums[left]){
+                    right = mid-1;
+                }
+                else{
+                    left = mid+1;
+                }
+            }
+            // 数组右边有序
+            else{
+                if (nums[mid] < target && target <= nums[right]){
+                    left = mid+1;
+                }
+                else{
+                    right = mid-1;
+                }
+            }
+        }
+        return -1;
+    }
+};
+```
+
+### [153. Find Minimum in Rotated Sorted Array](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/)
+
+> Suppose an array of length n sorted in ascending order is rotated between 1 and n times. For example, the array nums = $[0,1,2,4,5,6,7]$ might become:
+> 
+> $[4,5,6,7,0,1,2]$ if it was rotated 4 times.
+> 
+> $[0,1,2,4,5,6,7]$ if it was rotated 7 times.
+> 
+> Notice that rotating an array $[a[0], a[1], a[2], ..., a[n-1]]$ 1 time results in the array $[a[n-1], a[0], a[1], a[2], ..., a[n-2]]$.
+> 
+>Given the sorted rotated array nums, return the **minimum** element of this array.
+- 同上一题
+```c++
+class Solution {
+public:
+    int findMin(vector<int>& nums) {
+        int res = -1;
+        int left = 0, right = nums.size()-1;
+        while(left < right){
+            int mid = left + (right - left)/2;
+            if (nums[mid] < nums[right]){ 
+                // 右半边有序（递增），直接right=mid，不要想复杂
+                right = mid;
+            }
+            else{
+                // 左半边有序（递增），则最小值（原数组起点）被rotate到右半边
+                left = mid+1;
+            }
+        }
+        return nums[left];
     }
 };
 ```
