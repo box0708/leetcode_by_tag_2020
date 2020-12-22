@@ -234,16 +234,6 @@ public:
 > You may not modify the values in the list's nodes, only nodes itself may be changed.
 - 链表找到需要断开的地方，切分，然后维护两个指针把两个链表串起来
 ```c++
-/**
- * Definition for singly-linked list.
- * struct ListNode {
- *     int val;
- *     ListNode *next;
- *     ListNode() : val(0), next(nullptr) {}
- *     ListNode(int x) : val(x), next(nullptr) {}
- *     ListNode(int x, ListNode *next) : val(x), next(next) {}
- * };
- */
 class Solution {
 public:
     void reorderList(ListNode* head) {
