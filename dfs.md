@@ -98,3 +98,141 @@ public:
     }
 };
 ```
+---
+### [200. Number of Islands](https://leetcode-cn.com/problems/number-of-islands/)
+
+> Given an $m * n$ 2d grid map of `'1'`s (land) and `'0'`s (water), return the number of islands.
+> 
+> An island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.
+
+```c++
+class Solution {
+public:
+    int numIslands(vector<vector<char>>& grid) {
+        if (grid.size() == 0 || grid[0].size() == 0){
+            return 0;
+        }
+        int res=0;
+        for ( int i=0; i < grid.size(); i++){
+            for ( int j=0; j < grid[0].size(); j++){
+                if (grid[i][j] == '1'){
+                    res += 1;
+                    dfs(grid, i, j);
+                }
+            }
+        }
+        return res;
+    }
+    
+    void dfs(vector<vector<char>>& grid, int i, int j){
+        if ( i < 0 || j < 0 || i >= grid.size() || j >= grid[0].size() || grid[i][j] != '1'){
+            return;
+        }
+        grid[i][j] = '*';
+        dfs(grid, i-1, j);
+        dfs(grid, i+1, j);
+        dfs(grid, i, j-1);
+        dfs(grid, i, j+1);
+    }
+};
+```
+---
+### [329. Longest Increasing Path in a Matrix (记忆化搜索+DFS)](https://leetcode-cn.com/problems/longest-increasing-path-in-a-matrix/)
+
+> Given an integer matrix, find the length of the longest increasing path.
+> 
+> From each cell, you can either move to four directions: left, right, up or down. You may NOT move diagonally or move outside of the boundary (i.e. wrap-around is not allowed).
+- 记忆化搜索+DFS
+- 不要想复杂，`visited`作用可以被`dp`数组的值来指代
+- 为什么不会转圈圈（为什么不需要visited数组？） 因为题意求递增，转圈圈问题不会发生
+```c++
+class Solution {
+public:
+    int longestIncreasingPath(vector<vector<int>>& matrix) {
+        if ( matrix.empty() || matrix[0].empty()){
+            return 0;
+        }
+        int m = matrix.size(), n = matrix[0].size();
+        int result = INT_MIN;
+        //vector<vector<bool>> visited(m, vector<n, false>);
+        vector<vector<int>> dp(m, vector<int>(n, 0));
+        for ( int i=0; i < m; i++){
+            for ( int j=0; j < n; j++){
+                result = max(result, dfs(matrix, dp, i, j, m, n));
+            }
+        }
+        return result;
+    }
+    
+    int dfs(vector<vector<int>>& matrix, vector<vector<int>>& dp, int i, int j, int m, int n){
+        if (dp[i][j] > 0){
+            return dp[i][j];
+        }
+        // 四个相邻位置分别判断
+        if (i-1 >= 0 && i-1 < m && j >= 0 && j < n && matrix[i-1][j] > matrix[i][j]){
+            dp[i][j] = max(dp[i][j], dfs(matrix, dp, i-1, j, m, n));
+        }
+        if (i+1 >= 0 && i+1 < m && j >= 0 && j < n && matrix[i+1][j] > matrix[i][j]){
+            dp[i][j] = max(dp[i][j], dfs(matrix, dp, i+1, j, m, n));
+        }
+        if (i >= 0 && i < m && j-1 >= 0 && j-1 < n && matrix[i][j-1] > matrix[i][j]){
+            dp[i][j] = max(dp[i][j], dfs(matrix, dp, i, j-1, m, n));
+        }
+        if (i >= 0 && i < m && j+1 >= 0 && j+1 < n && matrix[i][j+1] > matrix[i][j]){
+            dp[i][j] = max(dp[i][j], dfs(matrix, dp, i, j+1, m, n));
+        }
+        dp[i][j] += 1;
+        return dp[i][j];
+    }
+};
+```
+---
+### [377. Combination Sum IV (记忆化搜索)](https://leetcode-cn.com/problems/combination-sum-iv/)
+> Given an integer array with all positive numbers and no duplicates, find the number of possible combinations that add up to a positive integer target.
+> ```
+> nums = [1, 2, 3]
+> target = 4
+>
+>The possible combination ways are:
+>(1, 1, 1, 1)
+>(1, 1, 2)
+>(1, 2, 1)
+>(1, 3)
+>(2, 1, 1)
+>(2, 2)
+>(3, 1)
+>
+>Note that different sequences are counted as different combinations.
+>
+>Therefore the output is 7.
+>
+> ```
+- 记忆化搜索：`helper`函数中，先做边界处理；如果已经有`target`对应的值直接返回；如果没有进入计算
+- DP不过，很奇怪，原因是大数相加溢出
+- 外层遍历target，内层遍历num
+```c++
+class Solution {
+public:
+    int combinationSum4(vector<int>& nums, int target) {
+        unordered_map<int, int> mem;
+        return helper(nums, target, mem);
+    }
+    int helper(vector<int>& nums, int target, unordered_map<int, int>& mem){
+        if (nums.empty() || target < 0){
+            return 0;
+        }
+        if (target == 0){
+            return 1;
+        }
+        if (mem.count(target) == 1){
+            return mem[target];
+        }
+        int res = 0;
+        for ( int num : nums){
+            res += helper(nums, target-num, mem);
+        }
+        mem[target] = res;
+        return res;
+    }
+};
+```
