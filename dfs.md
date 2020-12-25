@@ -252,6 +252,7 @@ class Solution {
 public:
     int findPaths(int m, int n, int N, int i, int j) {
         vector<vector<vector<uint>>> dp(N+1, vector<vector<uint>>(m, vector<uint>(n,0)));
+        // dp[n][x][y]: 从(x,y)位置出发，走n步，出去的路径数
         return dfs(dp, m, n, N, i, j) % 1000000007;
     }
     int dfs(vector<vector<vector<uint>>>& dp, int m, int n, int move, int x, int y){
@@ -282,7 +283,3 @@ public:
     }
 };
 ```
----
-### [827. Making A Large Island]([827. Making A Large Island](https://leetcode-cn.com/problems/making-a-large-island/))
-
-***DFS超时， todo***
