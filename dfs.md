@@ -236,3 +236,49 @@ public:
     }
 };
 ```
+---
+### [576. Out of Boundary Paths(还是记忆化搜索)](https://leetcode-cn.com/problems/out-of-boundary-paths/)
+
+> There is an m by n grid with a ball. Given the start coordinate (i,j) of the ball, you can move the ball to adjacent cell or cross the grid boundary in four directions (up, down, left, right). However, you can at most move N times. Find out the number of paths to move the ball out of grid boundary. The answer may be very large, return it after mod $10^9 + 7$.
+
+
+- （不一定准）看起来像dp但是解决起来比较麻烦的 考虑记忆化搜索
+- `dp[move][x][y] > 0` 记忆化搜索特点：一个值只求一遍
+- 边界条件的巧妙处理。此题第一个`if`就是避免了手动设置边界值，直接拿坐标来判断返回值
+
+
+```c++
+class Solution {
+public:
+    int findPaths(int m, int n, int N, int i, int j) {
+        vector<vector<vector<uint>>> dp(N+1, vector<vector<uint>>(m, vector<uint>(n,0)));
+        return dfs(dp, m, n, N, i, j) % 1000000007;
+    }
+    int dfs(vector<vector<vector<uint>>>& dp, int m, int n, int move, int x, int y){
+        if ( x < 0 || x >= m || y < 0 || y >= n){
+            return 1; // 已经走出去了
+        }
+        if ( move <= 0){
+            return 0; // 没有步数
+        }
+        if ( x-move >= 0 && x+move < m && y-move >= 0 && y+move < n){
+            return 0; // 肯定走不出去
+        }
+        // 记忆化搜索特点：某个值算出来了 就不再算了
+        if ( dp[move][x][y] > 0){
+            return dp[move][x][y];
+        }
+        int res = 0;
+        res += dfs(dp, m, n, move-1, x-1, y);
+        res %= 1000000007;
+        res += dfs(dp, m, n, move-1, x+1, y);
+        res %= 1000000007;
+        res += dfs(dp, m, n, move-1, x, y-1);
+        res %= 1000000007;
+        res += dfs(dp, m, n, move-1, x, y+1);
+        res %= 1000000007;
+        dp[move][x][y] = res;
+        return res;
+    }
+};
+```
