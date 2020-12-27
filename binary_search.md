@@ -35,7 +35,7 @@ public:
         int n = matrix.size();
         int left = matrix[0][0], right = matrix[n-1][n-1];
         // 按照值搜索。左上/右下为两个最值
-        // 核心思想：先求mid，然后看matrix里面<=mid的数字有多少个，根据count和k的大小关系更新左右值
+        // 核心思想：先求mid，然后看matrix里面<=mid的数字有多少个(中间数是第几小的数字)，根据count和k的大小关系更新左右值
         // 不懂的点：最后不会返回一个不在matrix里面的元素吗？
         while ( left <= right){
             int mid = left + (right - left)/2;
