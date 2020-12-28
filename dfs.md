@@ -143,6 +143,7 @@ public:
 > 
 > From each cell, you can either move to four directions: left, right, up or down. You may NOT move diagonally or move outside of the boundary (i.e. wrap-around is not allowed).
 - 记忆化搜索+DFS
+- dp[i][j]:从(i,j)开始的最xxx长度，确定值
 - 不要想复杂，`visited`作用可以被`dp`数组的值来指代
 - 为什么不会转圈圈（为什么不需要visited数组？） 因为题意求递增，转圈圈问题不会发生
 ```c++
