@@ -478,6 +478,47 @@ public:
 };
 ```
 ---
+### [115. Distinct Subsequences](https://leetcode-cn.com/problems/distinct-subsequences/)
+> Given two strings `s` and `t`, return the number of distinct subsequences of `s` which equals `t`.
+> 
+> A string's subsequence is a new string formed from the original string by deleting some (can be none) of the characters without disturbing the relative positions of the remaining characters. (i.e., `"ACE"` is a subsequence of `"ABCDE"` while `"AEC"` is not).
+> 
+> It's guaranteed the answer fits on a 32-bit signed integer.
+- 注意总结
+```c++
+class Solution {
+public:
+    int numDistinct(string s, string t) {
+        int m=s.size(), n=t.size();
+        vector<vector<long>> dp(m+1, vector<long>(n+1, 0));
+        dp[0][0] = 1; // 空串匹配空串，1个子序列
+        for ( int i=1; i < m+1; i++){
+            dp[i][0] = 1; // s串匹配空串，只有1个子序列
+        }
+        // dp[0][j] (j>=1) 默认为0，因为s空串时无法找出任何子序列匹配t串
+        for ( int i=1; i < m+1; i++){
+            for ( int j=1; j < n+1; j++){
+                // dp[i][j] 表示s串[0, i-1]的子串里找子序列，匹配t串[0, j-1]的子串
+                // 选择分支：选不选s[i-1]字符到当前匹配
+                if (s[i-1] == t[j-1]){
+                    /*
+                        s[i-1] == t[j-1], 此时有两个分支
+                        1）用当前位置字符s[i-1], 则当前结果加上dp[i-1][j-1], 相当于s[i-1]解决了t[j-1]位置字符
+                        2）不用当前位置字符s[i-1]，则加上s[0 -> i-2] 匹配 t[0 -> j-2]结果
+                    */
+                    dp[i][j] = dp[i-1][j-1] + dp[i-1][j];
+                }
+                else{
+                    // 相当于上面的分支2）逻辑
+                    dp[i][j] = dp[i-1][j];
+                }
+            }
+        }
+        return dp[m][n];
+    }
+};
+```
+---
 ## 股票类dp问题(局部最优+全局最优)
 
 ### [188. Best Time to Buy and Sell Stock IV](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-iv/)
