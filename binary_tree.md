@@ -193,3 +193,40 @@ public:
     }
 };
 ```
+---
+## 树问题中的DFS
+
+### [100. Same Tree](https://leetcode-cn.com/problems/same-tree/)
+- 直接递归解题
+
+---
+### [113. Path Sum II](https://leetcode-cn.com/problems/path-sum-ii/)
+> Given a binary tree and a sum, find all root-to-leaf paths where each path's sum equals the given sum.
+> 
+> Note: A leaf is a node with no children.
+- DFS中注意`push_back`和`pop`的位置
+- 函数定义加`&`，引用传递
+```c++
+class Solution {
+public:
+    vector<vector<int>> pathSum(TreeNode* root, int sum) {
+        vector<vector<int>> res;
+        vector<int> temp;
+        helper(root, sum, res, temp);
+        return res;
+    }
+    void helper(TreeNode* root, int sum, vector<vector<int>>& res, vector<int>& temp){
+        if (!root){
+            return;
+        }
+        temp.push_back(root->val);
+        if (sum == root->val && !root->left && !root->right){
+            res.push_back(temp);
+        }
+        
+        helper(root->left, sum-root->val, res, temp);
+        helper(root->right, sum-root->val, res, temp);
+        temp.pop_back();
+    }
+};
+```
