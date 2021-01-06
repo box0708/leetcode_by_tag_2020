@@ -106,5 +106,51 @@ public:
     }
 };
 ```
+---
+# [986. Interval List Intersections](https://leetcode-cn.com/problems/interval-list-intersections/)
+> Given two lists of closed intervals, each list of intervals is pairwise disjoint and in sorted order.
+> 
+> Return the intersection of these two interval lists.
+> ```
+> Input: A = [[0,2],[5,10],[13,23],[24,25]], B = [[1,5],[8,12],[15,24],[25,26]]
+> Output: [[1,2],[5,5],[8,10],[15,23],[24,24],[25,25]]
+> ```
+- 双指针解题法
+```c++
+class Solution {
+public:
+    vector<vector<int>> intervalIntersection(vector<vector<int>>& A, vector<vector<int>>& B) {
+        vector<vector<int>> res;
+        if (A.empty() || B.empty()){
+            return res;
+        }
+        int lena = A.size(), lenb = B.size();
+        int ia=0, ib=0;
+        while (ia != lena && ib != lenb){
+            vector<int> curA = A[ia];
+            vector<int> curB = B[ib];
+            if (curA[1] < curB[0]){
+                ia++;
+            }
+            else if (curA[0] > curB[1]){
+                ib++;
+            }
+            else{
+                vector<int> tmp;
+                tmp.push_back(max(curA[0], curB[0]));
+                tmp.push_back(min(curA[1], curB[1]));
+                res.push_back(tmp);
+                if (curA[1] <= curB[1]){
+                    ia++;
+                }
+                else{
+                    ib++;
+                }
+            }
+        }
+        return res;
+    }
+};
+```
 
 

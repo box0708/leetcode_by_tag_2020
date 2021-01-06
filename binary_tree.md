@@ -230,3 +230,91 @@ public:
     }
 };
 ```
+---
+### [124. Binary Tree Maximum Path Sum 比较精妙](https://leetcode-cn.com/problems/binary-tree-maximum-path-sum/)
+> Given a **non-empty** binary tree, find the maximum path sum.
+> 
+> For this problem, a path is defined as any node sequence from some starting node to any node in the tree along the parent-child connections. The path must contain at least one node and does not need to go through the root.
+- 最大路径和三种可能：
+  - 以某节点为头 + 左子树上选一个路径
+  - 。。。。 + 右子树上选一个路径
+  - 穿过该节点
+- 详见备注
+```c++
+class Solution {
+public:
+    int maxPathSum(TreeNode* root) {
+        if (!root){
+            return 0;
+        }
+        int res = INT_MIN;
+        int tmp = helper(root, res);
+        return res;
+    }
+    
+    int helper(TreeNode* root, int& res){
+        /*
+            含义：以root为首的路径的最大和（可以理解为局部最大值）
+            res为引用，全局最大值
+        */
+        if (!root){
+            return 0;
+        }
+        // 此处和0求max，相当于对返回值剪枝，如果加出负数，加0就相当于剪掉
+        int left = max(helper(root->left, res), 0);
+        int right = max(helper(root->right, res), 0);
+        // 疑问：穿过root节点的路径一定最大嘛？
+        // 上一个备注解答了疑问
+        res = max(res, left + right + root->val);
+        
+        return max(left, right) + root->val;
+    }
+};
+```
+---
+### [437. Path Sum III 树+回溯](https://leetcode-cn.com/problems/path-sum-iii/)
+> You are given a binary tree in which each node contains an integer value.
+> 
+> Find the number of paths that sum to a given value.
+> 
+> The path does not need to start or end at the root or a leaf, but it must go downwards (traveling only from parent nodes to child nodes).
+> 
+> The tree has no more than 1,000 nodes and the values are in the range -1,000,000 to 1,000,000.
+- 路径，考虑回溯，`path`存的是根节点到当前节点的路径节点，`curSum`存的是从根节点到目前节点的累加和（从顶到下）
+- 题意要求中间某节点开始的路径也算，所以`for`循环从头开始删节点
+```c++
+class Solution {
+public:
+    int pathSum(TreeNode* root, int sum) {
+        if (!root){
+            return 0;
+        }
+        int res = 0;
+        int curSum = 0;
+        vector<TreeNode*> path;
+        helper(root, sum, curSum, path, res);
+        return res;
+    }
+    void helper(TreeNode* root, int sum, int curSum, vector<TreeNode*>& path, int& res){
+        if (!root){
+            return;
+        }
+        curSum += root->val;
+        path.push_back(root);
+        if (curSum == sum){
+            res += 1; // 从顶到当前节点路径和满足要求
+        }
+        int tmpSum = curSum;
+        for (int i=0; i < path.size()-1; i++){
+            // 从头开始删节点，看是否中间某节点开始有和等于sum的路径
+            tmpSum -= path[i]->val;
+            if (tmpSum == sum){
+                res += 1;
+            }
+        }
+        helper(root->left, sum, curSum, path, res);
+        helper(root->right, sum, curSum, path, res);
+        path.pop_back();
+    }
+};
+```
