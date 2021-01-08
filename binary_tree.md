@@ -318,3 +318,222 @@ public:
     }
 };
 ```
+---
+### [剑指 Offer 26. 树的子结构](https://leetcode-cn.com/problems/shu-de-zi-jie-gou-lcof/)
+> 输入两棵二叉树A和B，判断B是不是A的子结构。(约定空树不是任意一个树的子结构)
+> 
+> B是A的子结构， 即 A中有出现和B相同的结构和节点值。
+> ```
+> 例如:
+> 给定的树 A:
+> 
+>      3
+>     / \
+>    4   5
+>   / \
+>  1   2
+> 给定的树 B：
+> 
+>    4 
+>   /
+>  1
+> 返回 true，因为 B 与 A 的一个子树拥有相同的结构和节点值。
+> ```
+- 本题`helper`函数类似判断两棵树是否相同的逻辑，但是需要定制
+```c++
+class Solution {
+public:
+    bool isSubStructure(TreeNode* A, TreeNode* B) {
+        if (!A || !B){
+            // 题干要求，空树为false
+            return false;
+        }
+        else if ( A->val == B->val && helper(A->left, B->left) && helper(A->right, B->right)){
+            // 当前节点匹配上，则检查左右子树是否符合子结构
+            return true;
+        }
+        // 当前节点失配，在A的左右树找“子结构的根节点”
+        return isSubStructure(A->left, B) || isSubStructure(A->right, B);
+    }
+    bool helper(TreeNode* A, TreeNode* B){
+        if (!B){
+            // B树到头了，匹配成功
+            return true;
+        }
+        if (!A || (A->val != B->val)){
+            // A树到头了，B树还有节点，false
+            return false;
+        }
+        else{
+            // 递归检查左右子树
+            return helper(A->left, B->left) && helper(A->right, B->right);
+        }
+    }
+};
+```
+---
+### [剑指 Offer 33. 二叉搜索树的后序遍历序列](https://leetcode-cn.com/problems/er-cha-sou-suo-shu-de-hou-xu-bian-li-xu-lie-lcof/)
+> 输入一个整数数组，判断该数组是不是某二叉搜索树的后序遍历结果。如果是则返回 `true`，否则返回 `false`。假设输入的数组的任意两个数字都互不相同。
+- 后序遍历特点：左孩子 右孩子 根节点
+- 二叉搜索树特点：左子树任一节点 < 根节点 < 右子树任一节点
+- 递归思路：分别找根节点的左孩子和右孩子，达标后检查左子树和右子树是否达标
+- 第二个`while`改成`for`循环能加快运行速度，剪枝
+```c++
+class Solution {
+public:
+    bool verifyPostorder(vector<int>& postorder) {
+        if (postorder.empty()){
+            return true;
+        }
+        return helper(postorder, 0, postorder.size()-1);
+    }
+    bool helper(vector<int>& arr, int start, int end){
+        if (start >= end){
+            return true;
+        }
+        int index = start;
+        while (arr[index] < arr[end]){ // 不能是<= 否则会直接走到end下标
+            index ++;
+        }
+        int pos = index; // [start, index-1]为左子树所有节点，[index, end-1]为右子树所有节点
+        while (arr[index] > arr[end]){
+            index ++; // 右子树是否都大于根节点
+        }
+        if (index != end){
+            return false; // 右子树发现比根节点小的，false
+        }
+        return helper(arr, start, index-1) && helper(arr, index, end-1);
+    }
+};
+```
+---
+## 树+链表
+
+### [109. Convert Sorted List to Binary Search Tree](https://leetcode-cn.com/problems/convert-sorted-list-to-binary-search-tree/)
+> Given the head of a singly linked list where elements are **sorted in ascending order**, convert it to a height balanced BST.
+> 
+> For this problem, a height-balanced binary tree is defined as a binary tree in which the depth of the two subtrees of every node never differ by more than 1.
+> ```
+> Input: head = [-10,-3,0,5,9]
+> Output: [0,-3,9,-10,null,5]
+> Explanation: One possible answer is [0,-3,9,-10,null,5], which represents the shown > height balanced BST.
+> ```
+- 快慢指针找链表中点，然后递归
+- coding细节：`if (head != slow)`
+```c++
+class Solution {
+public:
+    TreeNode* sortedListToBST(ListNode* head) {
+        if (!head){
+            return NULL;
+        }
+        if (!head->next){
+            return new TreeNode(head->val);
+        }
+        ListNode* slow=head, *fast=head, *last=head;
+        while(fast->next && fast->next->next){
+            last = slow;
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        // slow为链表中点
+        TreeNode* cur_head = new TreeNode(slow->val);
+        fast = slow->next;
+        //slow->next = NULL;
+        last->next = NULL;
+        if (head != slow){
+            cur_head->left = sortedListToBST(head);
+        }
+        cur_head->right = sortedListToBST(fast);
+        return cur_head;
+    }
+};
+```
+---
+## 树的重新构建
+
+### [105. Construct Binary Tree from Preorder and Inorder Traversal 前序中序重建二叉树](https://leetcode-cn.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/)
+```c++
+class Solution {
+public:
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        if (preorder.empty() || inorder.empty()){
+            return NULL;
+        }
+        return helper(preorder, inorder, 0, preorder.size()-1, 0, inorder.size()-1);
+    }
+    TreeNode* helper(vector<int>& preorder, vector<int>& inorder, int pstart, int pend, int instart, int inend){
+        // 递归调用，找根节点，分左右子树
+        if (pstart > pend || instart > inend){
+            return NULL;
+        }
+        int cur_root_value = preorder[pstart];
+        int pos_inorder = instart;
+        for ( ; pos_inorder <= inend; pos_inorder++){
+            if (inorder[pos_inorder] == cur_root_value){
+                break; // 当前根节点在中序遍历中的下标
+            }
+        }
+        TreeNode* cur_root = new TreeNode(cur_root_value);
+        cur_root->left = helper(preorder, inorder, pstart+1, pstart + pos_inorder - instart, instart, pos_inorder-1);
+        cur_root->right = helper(preorder, inorder, pstart + pos_inorder - instart+1, pend, pos_inorder+1, inend);
+        return cur_root;
+    }
+};
+```
+
+### [297. Serialize and Deserialize Binary Tree 二叉树序列化/反序列化](https://leetcode-cn.com/problems/serialize-and-deserialize-binary-tree/)
+> Design an algorithm to serialize and deserialize a binary tree. There is no restriction on how your serialization/deserialization algorithm should work. You just need to ensure that a binary tree can be serialized to a string and this string can be deserialized to the original tree structure.
+- 本质还是先序遍历增加对`None`指针的处理，反序列化时同理反推
+```python
+# Definition for a binary tree node.
+# class TreeNode(object):
+#     def __init__(self, x):
+#         self.val = x
+#         self.left = None
+#         self.right = None
+
+class Codec:
+    
+    def helper_encode(self, root, ans):
+        if root is None:
+            return ans + '#,'
+        ans += str(root.val) + ','
+        ans = self.helper_encode(root.left, ans)
+        ans = self.helper_encode(root.right, ans)
+        return ans
+
+    def serialize(self, root):
+        """Encodes a tree to a single string.
+        
+        :type root: TreeNode
+        :rtype: str
+        """
+        return self.helper_encode(root, '')[:-1]
+    
+    def helper_decode(self, nodes):
+        if nodes:
+            if nodes[0] == '#':
+                nodes.pop(0)
+                return None
+            root = TreeNode(nodes.pop(0))
+            root.left = self.helper_decode(nodes)
+            root.right = self.helper_decode(nodes)
+            return root
+        return None
+    
+
+    def deserialize(self, data):
+        """Decodes your encoded data to tree.
+        
+        :type data: str
+        :rtype: TreeNode
+        """
+        return self.helper_decode(data.split(','))
+        
+
+# Your Codec object will be instantiated and called as such:
+# ser = Codec()
+# deser = Codec()
+# ans = deser.deserialize(ser.serialize(root))
+```
