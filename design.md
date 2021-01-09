@@ -47,3 +47,95 @@ public:
     }
 };
 ```
+---
+### [384. Shuffle an Array 洗牌算法](https://leetcode-cn.com/problems/shuffle-an-array/)
+Given an integer array nums, design an algorithm to randomly shuffle the array.
+
+Implement the Solution class:
+
+- `Solution(int[] nums)` Initializes the object with the integer array nums.
+- `int[] reset()` Resets the array to its original configuration and returns it.
+- `int[] shuffle()` Returns a random shuffling of the array.
+  
+蓄水池抽样思想
+```c++
+class Solution {
+private:
+    vector<int> arr;
+public:
+    Solution(vector<int>& nums) {
+        arr.assign(nums.begin(), nums.end());
+        
+    }
+    
+    /** Resets the array to its original configuration and return it. */
+    vector<int> reset() {
+        return arr;
+    }
+    
+    /** Returns a random shuffling of the array. */
+    vector<int> shuffle() {
+        vector<int> res = arr;
+        for (int i=0; i < res.size(); i++){
+            // 对遍历到的每个位置，随机选择其和后面某位置数字互换
+            int t = i + rand() % (res.size()-i);
+            swap(res[i], res[t]);
+        }
+        return res;
+    }
+};
+
+/**
+ * Your Solution object will be instantiated and called as such:
+ * Solution* obj = new Solution(nums);
+ * vector<int> param_1 = obj->reset();
+ * vector<int> param_2 = obj->shuffle();
+ */
+```
+---
+### [382. Linked List Random Node](https://leetcode-cn.com/problems/linked-list-random-node/)
+> Given a singly linked list, return a random node's value from the linked list. Each node must have the **same probability** of being chosen.
+- 蓄水池抽样，同上
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+private:
+    ListNode* H;
+public:
+    /** @param head The linked list's head.
+        Note that the head is guaranteed to be not null, so it contains at least one node. */
+    Solution(ListNode* head) {
+        H = head;
+    }
+    
+    /** Returns a random node's value. */
+    int getRandom() {
+        int res = H->val, i=2;
+        ListNode* cur = H->next;
+        while(cur){
+            int j = rand() % i;
+            if (j == 0){
+                res = cur->val;
+            }
+            i += 1;
+            cur = cur->next;
+        }
+        return res;
+    }
+};
+
+/**
+ * Your Solution object will be instantiated and called as such:
+ * Solution* obj = new Solution(head);
+ * int param_1 = obj->getRandom();
+ */
+```
