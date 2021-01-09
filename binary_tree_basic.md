@@ -1,7 +1,7 @@
-# 二叉树相关
+# 二叉树基础
 
 ## 遍历写法
-
+---
 ### [94. Binary Tree Inorder Traversal 中序非递归遍历](https://leetcode-cn.com/problems/binary-tree-inorder-traversal/)
 ```c++
 class Solution {
@@ -32,3 +32,4 @@ public:
     }
 };
 ```
+---

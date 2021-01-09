@@ -481,6 +481,41 @@ public:
     }
 };
 ```
+---
+### [106. Construct Binary Tree from Inorder and Postorder Traversal](https://leetcode-cn.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/)
+> Given inorder and postorder traversal of a tree, construct the binary tree.
+- 基本同上，注意下标
+```c++
+class Solution {
+public:
+    TreeNode* buildTree(vector<int>& inorder, vector<int>& postorder) {
+        if (inorder.empty() || postorder.empty()){
+            return NULL;
+        }
+        return helper(inorder, postorder, 0, inorder.size()-1, 0, postorder.size()-1);
+    }
+    
+    TreeNode* helper(vector<int>& in, vector<int>& post, int instart, int inend, int pstart, int pend){
+        if (instart > inend || pstart > pend){
+            return NULL;
+        }
+        int cur_value = post[pend]; // 当前根节点值
+        int pos = instart; // 根节点在中序遍历中的位置
+        // 左子树节点个数 pos-instart   右子树节点个数 inend-pos
+        for ( ; pos <= inend; pos++){
+            if (in[pos] == cur_value){
+                break;
+            }
+        }
+        // 左右子树递归
+        TreeNode* cur = new TreeNode(cur_value);
+        // 此处注意下标
+        cur->left = helper(in, post, instart, pos-1, pstart, pstart+pos-instart-1);
+        cur->right = helper(in, post, pos+1, inend, pstart+pos-instart, pend-1);
+        return cur;
+    }
+};
+```
 
 ### [297. Serialize and Deserialize Binary Tree 二叉树序列化/反序列化](https://leetcode-cn.com/problems/serialize-and-deserialize-binary-tree/)
 > Design an algorithm to serialize and deserialize a binary tree. There is no restriction on how your serialization/deserialization algorithm should work. You just need to ensure that a binary tree can be serialized to a string and this string can be deserialized to the original tree structure.
