@@ -32,3 +32,29 @@ public:
     }
 };
 ```
+---
+
+### [49. Group Anagrams](https://leetcode-cn.com/problems/group-anagrams/)
+> Given an array of strings strs, group the anagrams together. You can return the answer in any order.
+> 
+> An Anagram is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.
+
+```c++
+class Solution {
+public:
+    vector<vector<string>> groupAnagrams(vector<string>& strs) {
+        vector<vector<string>> res;
+        unordered_map<string, int> m;
+        for (string s : strs){
+            string tmp = s;
+            sort(tmp.begin(), tmp.end()); // anagram排序后是唯一的字符串
+            if (!m.count(tmp)){
+                m[tmp] = res.size(); // map不含当前‘唯一字符串’，就把在res中的下标存进去
+                res.push_back({});
+            }
+            res[m[tmp]].push_back(s);
+        }
+        return res;
+    }
+};
+```
