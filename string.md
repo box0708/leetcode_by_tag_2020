@@ -49,7 +49,7 @@ public:
             string tmp = s;
             sort(tmp.begin(), tmp.end()); // anagram排序后是唯一的字符串
             if (!m.count(tmp)){
-                m[tmp] = res.size(); // map不含当前‘唯一字符串’，就把在res中的下标存进去
+                m[tmp] = res.size(); // map不含当前‘唯一字符串’，就把在res中的下标存进去    
                 res.push_back({});
             }
             res[m[tmp]].push_back(s);
