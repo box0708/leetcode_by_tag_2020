@@ -208,3 +208,69 @@ public:
     }
 };
 ```
+---
+### [207. Course Schedule 图+bfs](https://leetcode-cn.com/problems/course-schedule/)
+```
+There are a total of numCourses courses you have to take, 
+labeled from 0 to numCourses-1.
+
+Some courses may have prerequisites, 
+for example to take course 0 you have to first take course 1, 
+which is expressed as a pair: [0,1]
+
+Given the total number of courses and a list of prerequisite pairs, 
+is it possible for you to finish all courses?
+
+Example 1:
+
+Input: numCourses = 2, prerequisites = [[1,0]]
+Output: true
+Explanation: There are a total of 2 courses to take. 
+             To take course 1 you should have finished course 0. So it is possible.
+Example 2:
+
+Input: numCourses = 2, prerequisites = [[1,0],[0,1]]
+Output: false
+Explanation: There are a total of 2 courses to take. 
+             To take course 1 you should have finished course 0, and to take course 0 you should
+             also have finished course 1. So it is impossible.
+
+```
+- 见注释
+```c++
+class Solution {
+public:
+    bool canFinish(int numCourses, vector<vector<int>>& prerequisites) {
+        vector<vector<int>> graph(numCourses, vector<int>());
+        vector<int> in(numCourses);
+        for (auto a : prerequisites){
+            // 建图
+            in[a[0]] += 1; // 入度+1
+            graph[a[1]].push_back(a[0]); // 有向图构建边
+        }
+        queue<int> q;
+        for (int i=0; i < numCourses; i++){
+            if (in[i] == 0){
+                // 直接就能选的课
+                q.push(i);
+            }
+        }
+        while (!q.empty()){
+            int cur = q.front();
+            q.pop();
+            for (int c : graph[cur]){
+                in[c]--; // 入度-1
+                if (in[c] == 0){
+                    q.push(c); // 入度为0，能选这门课，加入队列
+                }
+            }
+        }
+        for (int i=0; i < numCourses; i++){
+            if (in[i] != 0){
+                return false;
+            }
+        }
+        return true;
+    }
+};
+```

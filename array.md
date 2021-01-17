@@ -543,4 +543,45 @@ public:
     }
 };
 ```
-
+---
+### [4. Median of Two Sorted Arrays](https://leetcode-cn.com/problems/median-of-two-sorted-arrays/)
+> Given two sorted arrays `nums1` and `nums2` of size m and n respectively, return the *median* of the two sorted arrays.
+- 找两个排序数组的中位数，要求时间复杂度 $O(log(m+n))$，考虑二分查找
+- 考虑两个数组总长度m+n的奇偶，中位数计算分2种情况。`left`和`right`是一个技巧，无论奇偶都能cover
+- 中心思想：不merge，在两个数组中找第k小的数字 -> 分别在两个数组找第k/2小的数字，比较大小 -> 一次删掉k/2个不可能的数字，继续递归。[参考资料](https://www.cnblogs.com/grandyang/p/4465932.html)
+```c++
+class Solution {
+public:
+    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+        int m=nums1.size(), n=nums2.size(), left=(m+n+1)/2, right=(m+n+2)/2; // trick here
+        // find kth
+        return (find_Kth(nums1, 0, nums2, 0, left) + find_Kth(nums1, 0, nums2, 0, right)) / 2.0;
+    }
+    int find_Kth(vector<int>& nums1, int i, vector<int>& nums2, int j, int k){
+        // 在nums1和nums2混合的数组中求从小到大第k个数字
+        if (i >= nums1.size()){
+            return nums2[j + k -1];
+        }
+        if (j >= nums2.size()){
+            return nums1[i + k -1];
+        }
+        if (k == 1){
+            return min(nums1[i], nums2[j]);
+        }
+        // 开始正戏
+        int mid1 = INT_MAX, mid2 = INT_MAX;
+        if ((i + k/2 -1) < nums1.size()){
+            mid1 = nums1[i + k/2 -1];
+        }
+        if ((j + k/2 -1) < nums2.size()){
+            mid2 = nums2[j + k/2 -1];
+        }
+        if (mid1 > mid2){
+            return find_Kth(nums1, i, nums2, j+k/2, k-k/2);
+        }
+        else{
+            return find_Kth(nums1, i+k/2, nums2, j, k-k/2);
+        }
+    }
+};
+```

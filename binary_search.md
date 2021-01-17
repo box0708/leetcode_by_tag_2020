@@ -8,7 +8,7 @@
 - 注意区间条件的写法（有没有等于号，left/right的更新条件）
 
 ---
-
+## 二维数组的二分查找
 ### [378. Kth Smallest Element in a Sorted Matrix](https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/)
 ```
 Given a n x n matrix where each of the rows and columns are sorted in ascending order, find the kth smallest element in the matrix.
@@ -57,9 +57,39 @@ public:
     }
 };
 ```
-
 ---
+### [240. Search a 2D Matrix II](https://leetcode-cn.com/problems/search-a-2d-matrix-ii/)
+> Write an efficient algorithm that searches for a `target` value in an `m x n` integer `matrix`. The matrix has the following properties:
+> 
+> - Integers in each row are sorted in ascending from left to right.
+>
+> - Integers in each column are sorted in ascending from top to bottom.
 
+```c++
+class Solution {
+public:
+    bool searchMatrix(vector<vector<int>>& matrix, int target) {
+        if (matrix.empty() || matrix[0].empty()){
+            return false;
+        }
+        int x = 0, y = matrix[0].size()-1;
+        while (x <= matrix.size()-1 && y >= 0){
+            if (matrix[x][y] == target){
+                return true;
+            } 
+            else if (matrix[x][y] > target){
+                y -= 1;
+            }
+            else{
+                x += 1;
+            }
+        }
+        return false;
+    }
+};
+```
+---
+## 有重复元素二分查找，找边界
 ### [34. Find First and Last Position of Element in Sorted Array](https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/)
 ```
 Given an array of integers nums sorted in ascending order, find the starting and ending position of a given target value.

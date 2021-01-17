@@ -311,3 +311,99 @@ public:
     }
 };
 ```
+---
+### [142. Linked List Cycle II 找链表环的入口](https://leetcode-cn.com/problems/linked-list-cycle-ii/)
+- 指针边界控制，见注释
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode *detectCycle(ListNode *head) {
+        if (!head || !head->next){
+            return NULL;
+        }
+        ListNode* fast=head, *slow=head;
+        while (fast && fast->next){ // 细节1：检查fast指针是否走出去了
+            slow = slow->next;
+            fast = fast->next->next;
+            // 细节2：这个判断不能写在while条件内
+            if (slow == fast){
+                break;
+            }
+        }
+        if (!fast || !fast->next){
+            // 细节3
+            return NULL;
+        }
+        //int res = 0;
+        slow = head;
+        while (slow != fast){
+            slow = slow->next;
+            fast = fast->next;
+            //res += 1;
+        }
+        return slow;
+    }
+};
+```
+---
+### [148. Sort List 链表归并排序](https://leetcode-cn.com/problems/sort-list/)
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* sortList(ListNode* head) {
+        if (!head || !head->next){
+            return head;
+        }
+        ListNode* slow = head, *fast = head, *pre = head;
+        // 1) 找中点
+        while(fast && fast->next){
+            pre = slow;
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        pre->next = NULL;
+        // 2）归并排序 merge操作
+        return merge(sortList(head), sortList(slow));
+    }
+    ListNode* merge(ListNode* h1, ListNode* h2){
+        ListNode* fakeHead = new ListNode(-1);
+        ListNode* cur = fakeHead;
+        while (h1 && h2){
+            if (h1->val <= h2->val){
+                cur->next = h1;
+                h1 = h1->next;
+            }
+            else{
+                cur->next = h2;
+                h2 = h2->next;
+            }
+            cur = cur->next;
+        }
+        if (h1){
+            cur->next = h1;
+        }
+        if (h2){
+            cur->next = h2;
+        }
+        return fakeHead->next;
+    }
+};
+```

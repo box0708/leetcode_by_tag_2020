@@ -17,7 +17,7 @@
 > The minimum path sum from top to bottom is 11 (i.e., 2 + 3 + 5 + 1 = 11).
 - 正向/反向求解的变换
 - 初始化起点/终点，求终点/起点
-```
+```c++
 class Solution {
 public:
     int minimumTotal(vector<vector<int>>& triangle) {
@@ -35,6 +35,7 @@ public:
     }
 };
 ```
+## dp解决回文串问题
 ---
 ### [132. Palindrome Partitioning II](https://leetcode.com/problems/palindrome-partitioning-ii/)
 *sss dp+字符串*
@@ -42,8 +43,6 @@ public:
 Given a string s, partition s such that every substring of the partition is a palindrome.
 
 Return the minimum cuts needed for a palindrome partitioning of s.
-
- 
 
 Example 1:
 
@@ -54,7 +53,7 @@ Explanation: The palindrome partitioning ["aa","b"] could be produced using 1 cu
 - 必会。回文：i-j已是回文，i-1，j+1若相等，也是回文
 - coding细节 看注释
 - 先遍历`0-i`，循环内遍历`0-j`,分`[0-j-1],[j-i]`求解
-```
+```c++
 class Solution {
 public:
     int minCut(string s) {
@@ -99,7 +98,6 @@ Input: "abc"
 Output: 3
 Explanation: Three palindromic strings: "a", "b", "c".
  
-
 Example 2:
 
 Input: "aaa"
@@ -107,7 +105,7 @@ Output: 6
 Explanation: Six palindromic strings: "a", "a", "a", "aa", "aa", "aaa".
 ```
 - 基本同上一题。dp解回文题的套路需要背
-```
+```c++
 class Solution {
 public:
     int countSubstrings(string s) {
@@ -123,6 +121,52 @@ public:
                     dp[j][i] = true;
                     res += 1;
                 }
+            }
+        }
+        return res;
+    }
+};
+```
+---
+### [32. Longest Valid Parentheses 最长合格括号字串问题](https://leetcode-cn.com/problems/longest-valid-parentheses/)
+> Given a string containing just the characters `'('` and `')'`, find the length of the longest valid (well-formed) parentheses substring.
+> 
+> Example 2:
+> 
+> Input: s = `")()())"`
+> 
+> Output: 4
+> 
+> Explanation: The longest valid parentheses substring is `"()()"`.
+- 与回文串问题相似，但不完全相同，见注释
+- 为什么不达标时候`dp[i]`置0：dp数组算的是以某一位置**结尾**的xxxx。
+```c++
+class Solution {
+public:
+    int longestValidParentheses(string s) {
+        if(s.size() <= 1){
+            return 0;
+        }
+        int n = s.size(), res=0;
+        vector<int> dp(n+1, 0); // dp[i]: 以s[i-1]结尾的字符串中，符合要求的最长字串长度
+        for (int i=1; i < n+1; i++){
+            /*
+                j下标含义：能知道dp[i-1]，也就是s[i-2]结尾的字符串中最长字串长度
+                那么往回倒，s[j]是要和s[i-1]匹配的对应下标
+            */
+            int j = (i-1) - dp[i-1] -1; 
+            if (j < 0 || s[i-1] != ')' || s[j] != '('){
+                dp[i] = 0; // 如果不满足匹配，那么置0
+            }
+            else{
+                /*
+                    s[j]和s[i-1]匹配上，更新dp[i]，三部分拼起来
+                    dp[i-1]: s[j+1]到s[i-2]的满足要求字串长度
+                    2: s[j]和s[i-1]增加的往两边扩的长度
+                    dp[j]: s[j-1]结尾的满足要求长度
+                */
+                dp[i] = dp[i-1] + 2 + dp[j];
+                res = max(res, dp[i]);
             }
         }
         return res;
@@ -173,7 +217,6 @@ public:
 ```
 ---
 ## 双序列动态规划
-
 ### [***10. Regular Expression Matching](https://leetcode.com/problems/regular-expression-matching/) 
 ```
 Given an input string (s) and a pattern (p), implement regular expression matching with support for '.' and '*' where: 
@@ -209,7 +252,7 @@ Output: false
 ```
 - 见代码注释
 - 异常输入要做处理，就算题干没说
-```
+```c++
 class Solution {
 public:
     bool isMatch(string s, string p) {
