@@ -123,9 +123,6 @@ public:
     }
 };
 ```
-
-
-
 ---
 ### [41. First Missing Positive](https://leetcode-cn.com/problems/first-missing-positive/)
 > Given an unsorted integer array nums, find the smallest missing positive integer.
@@ -134,6 +131,8 @@ public:
 > Input: nums = [1,2,0]
 > Output: 3
 > ```
+>
+
 - 把1放在`nums[0]`，2放在`nums[1]`，...（即如果`nums[i] > 0`, `nums[i]` 在`nums[nums[i]-1]`）
 ```c++
 class Solution {
@@ -153,6 +152,42 @@ public:
             }
         }
         return n+1;
+    }
+};
+```
+---
+### [287. Find the Duplicate Number](https://leetcode-cn.com/problems/find-the-duplicate-number/)
+> Given an array of integers nums containing `n + 1` integers where each integer is in the range `[1, n]` inclusive.
+> 
+> There is **only one repeated number** in nums, return this repeated number.
+> ```
+> Example 1
+> Input: nums = [1,3,4,2,2]
+> Output: 2
+> ```
+- 第一次尝试上一题的思路，不ac
+- 二分查找思想
+```c++
+class Solution {
+public:
+    int findDuplicate(vector<int>& nums) {
+        int left=1, right=nums.size()-1;
+        while(left <= right){
+            // 限定数字[1,n]，先找中点，再遍历nums，看<=mid的个数
+            int cnt=0, mid = left + (right-left)/2;
+            for (int num : nums){
+                if (num <= mid){
+                    cnt += 1;
+                }
+            }
+            if (cnt <= mid){
+                left = mid+1;
+            }
+            else{
+                right = mid-1;
+            }
+        }
+        return left;
     }
 };
 ```

@@ -274,3 +274,71 @@ public:
     }
 };
 ```
+---
+### [301. Remove Invalid Parentheses](https://leetcode-cn.com/problems/remove-invalid-parentheses/)
+> Remove the minimum number of invalid parentheses in order to make the input string valid. Return all possible results.
+> 
+> Note: The input string may contain letters other than the parentheses ( and ).
+```
+Example 1:
+Input: "()())()"
+Output: ["()()()", "(())()"]
+```
+- 见注释
+```c++
+class Solution {
+public:
+    vector<string> removeInvalidParentheses(string s) {
+        vector<string> res;
+        unordered_set<string> visited({s}); // hashset记录是否被处理过
+        queue<string> q({s}); // bfs特征
+        // 这个变量位置需要注意，题目限定删除尽可能少的字符
+        // 定义在while外面代表‘到某一层能得到达标字符串就不再往下遍历了’
+        bool found = false; 
+        while (!q.empty()){
+            string cur = q.front();
+            q.pop();
+            if (check(cur)){
+                // 达标，加入res
+                res.push_back(cur);
+                found = true;
+            }
+            if (found){
+                /*
+                    此处不能是break，因为此题的bfs每层实际是‘删除了几个字符’
+                    删除字符个数固定，解可能有多种
+                */
+                continue;
+            }
+            for (int i=0; i < cur.size(); i++){
+                if (cur[i] != '(' && cur[i] != ')') continue;
+                // trick：c++删除某一字符
+                string new_s = cur.substr(0, i) + cur.substr(i+1); 
+                if (!visited.count(new_s)){
+                    visited.insert(new_s);
+                    q.push(new_s); // bfs常规
+                }
+            }
+        }
+        return res;
+    }
+    bool check(string s){
+        int cnt=0;
+        for (char c : s){
+            if (c!='(' && c!=')'){
+                continue;
+            }
+            else if (c == '('){
+                cnt += 1;
+            }
+            else if (c == ')'){
+                cnt -= 1;
+                if (cnt < 0){
+                    return false;
+                }
+            }
+        }
+        return cnt == 0;
+    }
+};
+```

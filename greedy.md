@@ -74,3 +74,35 @@ public:
     }
 };
 ```
+---
+### [134. Gas Station 加油站问题](https://leetcode-cn.com/problems/gas-station/)
+> here are `n` gas stations along a circular route, where the amount of gas at the ith station is `gas[i]`.
+> 
+> You have a car with an unlimited gas tank and it costs `cost[i]` of gas to travel from the $i^{th}$ station to its next $(i + 1)^{th}$ station. You begin the journey with an empty tank at one of the gas stations.
+> 
+> Given two integer arrays gas and cost, return the starting gas station's index if you can travel around the circuit once in the clockwise direction, otherwise return -1. If there exists a solution, it is guaranteed to be unique
+- 初始思路想复杂了
+- > 这道转圈加油问题不算很难，只要想通其中的原理就很简单。**我们首先要知道能走完整个环的前提是gas的总量要大于cost的总量**，这样才会有起点的存在。假设开始设置起点start = 0, 并从这里出发，如果当前的gas值大于cost值，就可以继续前进，此时到下一个站点，剩余的gas加上当前的gas再减去cost，看是否大于0，若大于0，则继续前进。当到达某一站点时，若这个值小于0了，则说明从起点到这个点中间的任何一个点都不能作为起点，则把起点设为下一个点，继续遍历。当遍历完整个环时，当前保存的起点即为所求。
+```c++
+class Solution {
+public:
+    int canCompleteCircuit(vector<int>& gas, vector<int>& cost) {
+        int total=0, tank=0, start=0;
+        for (int i=0; i < gas.size(); i++){
+            // 我们首先要知道能走完整个环的前提是gas的总量要大于cost的总量，全局
+            total = total + gas[i] - cost[i];
+            // 当前油箱余量
+            tank = tank + gas[i] - cost[i];
+            if (tank < 0){
+                // 余量<0，之前所有点都不能作为起点
+                start = i+1;
+                tank=0;
+            }
+        }
+        if (total < 0){
+            return -1;
+        }
+        return start;
+    }
+};
+```

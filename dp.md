@@ -35,6 +35,46 @@ public:
     }
 };
 ```
+---
+### [279. Perfect Squares](https://leetcode-cn.com/problems/perfect-squares/)
+> Given an integer n, return the least number of perfect square numbers that sum to n.
+> 
+> A perfect square is an integer that is the square of an integer; in other words, it is the product of some integer with itself. For example, 1, 4, 9, and 16 are perfect squares while 3 and 11 are not.
+```
+Example 1:
+
+Input: n = 12
+Output: 3
+Explanation: 12 = 4 + 4 + 4.
+```
+- 见注释
+```c++
+class Solution {
+public:
+    int numSquares(int n) {
+        if (n==1){
+            return 1;
+        }
+        vector<int> dp(n+1, INT_MAX); // dp[i]代表数字i最少由几个平方数求和得到
+        /*
+        每一个数都由前面的某个数加上一个完全平方数构成，
+        dynamic[i + sq] = dynamic[i] + 1:sq表示一个完全平方数，
+        所以数字i+sq可以由数字i加上完全平方数sq构成，
+        数字i需要dynamic[i]个完全平方数，
+        所以dynamic[i + sq]需要dynamic[i]加1个完全平方数.
+        我们用循环将数字i到n都和n以内的完全平方数字组合，得到dynamic[i]的解.
+        */
+        dp[0] = 0;
+        for (int i=0; i <= n; i++){
+            for (int j=1; i + j*j <=n; j++){
+                dp[i + j*j] = min(dp[i + j*j], dp[i]+1);
+            }
+        }
+        return dp.back();
+    }
+};
+```
+---
 ## dp解决回文串问题
 ---
 ### [132. Palindrome Partitioning II](https://leetcode.com/problems/palindrome-partitioning-ii/)
@@ -592,7 +632,7 @@ Explanation: Buy on day 2 (price = 2) and sell on day 3 (price = 6), profit = 6-
 - `local[i][j] = max( global[i-1][j-1] + max(0, diff), local[i-1][j] + diff);`更新方程的理解
   - `global[i-1][j-1] + max(0, diff)`: 第i-1天，已经交易了j-1次。在第i天要完成一次交易。如果能赚钱，i-1买i卖；如果不能，i买i卖（当天交易）
   - `local[i-1][j] + diff`: 第i-1天已经完成了j-1次交易，且第j次交易的买入在i-1天；此时第i天完成第j次交易的卖出。
-```
+```c++
 class Solution {
 public:
     int maxProfit(int k, vector<int>& prices) {
@@ -661,7 +701,7 @@ Explanation: there are four ways to make up the amount:
 ```
 - 做过的题注意总结
 - 边界条件处理
-```
+```c++
 class Solution {
 public:
     int change(int amount, vector<int>& coins) {
@@ -753,7 +793,7 @@ Other valid but smaller subsets include {"0001", "1"} and {"10", "1", "0"}.
 ```
 - 定义转移方程。一般来说让求什么值，dp状态就是这个值。此题是遍历字符串，dp值为数量
 - 循环，反向
-```
+```c++
 class Solution {
 public:
     int findMaxForm(vector<string>& strs, int m, int n) {
@@ -801,7 +841,7 @@ Hence, player 1 will never be the winner and you need to return False.
 ```
 - 博弈型经典题
 - 先手/后手的收益值列出来，注意带‘绝顶聪明’条件，min/max的写法
-```
+```c++
 class Solution {
 public:
     // 递归写法
@@ -860,7 +900,7 @@ public:
 >
 > $dp[i,j] = \text{max}(nums[i] - dp[i + 1][j], nums[j] - dp[i][j - 1]dp[i,j]=nums[i]−dp[i+1][j],nums[j]−dp[i][j−1])$.
 
-```
+```c++
 public class Solution {
     public boolean PredictTheWinner(int[] nums) {
         int[][] dp = new int[nums.length + 1][nums.length];
