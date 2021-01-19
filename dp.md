@@ -624,7 +624,7 @@ Input: k = 2, prices = [3,2,6,5,0,3]
 Output: 7
 Explanation: Buy on day 2 (price = 2) and sell on day 3 (price = 6), profit = 6-2 = 4. Then buy on day 5 (price = 0) and sell on day 6 (price = 3), profit = 3-0 = 3.
 ```
-- 此题为通解。[参考链接](https://www.jianshu.com/p/26f792f83ee4)
+- [参考链接](https://www.jianshu.com/p/26f792f83ee4)
 - `local[i][j]`代表局部最优：第`i`天最多`j`次交易最大利润
 - `global[i][j]`全局最优
 - 二维dp数组中`k`对应的那一维多开一位，同上面总结的题目
@@ -667,24 +667,75 @@ public:
 };
 ```
 ---
-## 背包类dp问题
-
-### 01背包问题
-
-> Q：有 N 件物品和一个容量为 V 的背包。放入第 i 件物品耗费的费用是 $C_i$，得到的 价值是 $W_i$。求解将哪些物品装入背包可使价值总和最大。
-
-A：dp解法。`dp[i][j]`表示前i件物品放入容量为j的背包可以获得最大价值
+### [309. Best Time to Buy and Sell Stock with Cooldown 股票问题+冷冻期](https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/)
+> 给定一个整数数组，其中第 i 个元素代表了第 i 天的股票价格 。​
+> 
+> 设计一个算法计算出最大利润。在满足以下约束条件下，你可以尽可能地完成更多的交易（多次买卖一支股票）:
+> 
+> - 你不能同时参与多笔交易（你必须在再次购买前出售掉之前的股票）。
+> - 卖出股票后，你无法在第二天买入股票 (即冷冻期为 1 天)。
 ```
-    dp[i][j] = max(dp[i-1][j], dp[i-1][j-c[i]] + w[i]) // 放 or 不放
+示例:
+输入: [1,2,3,0,2]
+输出: 3 
+解释: 对应的交易状态为: [买入, 卖出, 冷冻期, 买入, 卖出]
 ```
-
-### 完全背包问题
-
-> Q：与01背包相同，物品可以使用无限次
+- [参考链接](https://www.cnblogs.com/grandyang/p/4997417.html)
+- 见注释
+```c++
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        int n = prices.size();
+        if (n<=1){
+            return 0;
+        }
+        vector<int> buy(n, 0);//buy[i]表示在第i天之前最后一个操作是买，此时的最大收益。
+        vector<int> sell(n, 0);//sell[i]表示在第i天之前最后一个操作是卖，此时的最大收益。
+        vector<int> rest(n, 0);//rest[i]表示在第i天之前最后一个操作是冷冻期，此时的最大收益。
+        buy[0] = -prices[0]; // 第0天，buy[0]只能买入prices[0]，收益初始化
+        for (int i=1; i < n; i++){
+            int price = prices[i];
+            // buy[i]: 卖出股票后为冷冻期，选择为卖/不卖
+            buy[i] = max(buy[i-1], rest[i-1]-price);
+            // sell[i]: buy[i-1]+price为把之前买的卖掉；sell[i-1]为第i天无操作(隐含：rest[i] = sell[i-1])
+            sell[i] = max(sell[i-1], buy[i-1]+price);
+            // rest[i]:从前一天选最大的收益赋值
+            rest[i] = max(buy[i-1], max(sell[i-1], rest[i-1]));
+        }
+        return max(sell[n-1], rest[n-1]);
+    }
+};
 ```
-    dp[i][j] = max(dp[i-1][j], dp[i][j-c[i]] + w[i]) // 放 or 不放    
+## 硬币问题
+### [322. Coin Change](https://leetcode-cn.com/problems/coin-change/)
+> You are given coins of different denominations and a total amount of money amount. Write a function to compute the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return -1.
+> 
+> You may assume that you have an infinite number of each kind of coin.
+- 见注释
+```c++
+class Solution {
+public:
+    int coinChange(vector<int>& coins, int amount) {
+        //dp[i]:金额为i是最小的硬币数，此处用一维dp来解，但二维应该也可以
+        // 注意此处amount+1的初始化条件，隐含的是硬币最小金额为1，最多可能是amount个1，此处不用INT_MAX为了防止溢出
+        vector<int> dp(amount+1, amount+1);
+        dp[0] = 0; 
+        for (int money=0; money < amount+1; money++){
+            for (int j=0; j < coins.size(); j++){
+                if (coins[j] <= money){
+                    dp[money] = min(dp[money], dp[money-coins[j]]+1);
+                }
+            }
+        }
+        if (dp[amount] > amount){
+            return -1;
+        }
+        return dp[amount];
+    }
+};
 ```
-
+---
 ### [518. Coin Change 2](https://leetcode.com/problems/coin-change-2/)
 ```
 You are given coins of different denominations and a total amount of money. Write a function to compute the number of combinations that make up that amount. You may assume that you have infinite number of each kind of coin.
@@ -734,7 +785,24 @@ public:
     }
 };
 ```
+---
+## 背包类dp问题
 
+### 01背包问题
+
+> Q：有 N 件物品和一个容量为 V 的背包。放入第 i 件物品耗费的费用是 $C_i$，得到的 价值是 $W_i$。求解将哪些物品装入背包可使价值总和最大。
+
+A：dp解法。`dp[i][j]`表示前i件物品放入容量为j的背包可以获得最大价值
+```
+    dp[i][j] = max(dp[i-1][j], dp[i-1][j-c[i]] + w[i]) // 放 or 不放
+```
+
+### 完全背包问题
+
+> Q：与01背包相同，物品可以使用无限次
+```
+    dp[i][j] = max(dp[i-1][j], dp[i][j-c[i]] + w[i]) // 放 or 不放    
+```
 ### [416. Partition Equal Subset Sum](https://leetcode.com/problems/partition-equal-subset-sum/)
 ```
 Given a non-empty array nums containing only positive integers, find if the array can be partitioned into two subsets such that the sum of elements in both subsets is equal.
@@ -748,7 +816,7 @@ Explanation: The array can be partitioned as [1, 5, 5] and [11].
 - 转化为背包问题来解
 - 恰好装满，初始化条件与最大值不同
 - 第二层循环的遍历顺序，要倒序，因为不能覆盖前面的值（二维dp压成一维之后，每次进num循环时，存的值相当于二维dp中上一行的值）
-```
+```c++
 class Solution {
 public:
     bool canPartition(vector<int>& nums) {
